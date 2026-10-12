@@ -42,7 +42,7 @@ col1 <- do.call(rbind, lapply(lineage_order, function(l) {
 col2 <- data.frame(
   title = c("Frozen ALS-up module (15 genes)",
             "Bulk hold-out, frozen module (W55)",
-            "Bulk hold-out, 159-gene consensus (W59)",
+            "Bulk hold-out, 158-gene consensus (W59)",
             "snRNA-seq meta-analysis (W58)",
             "Published deconvolution (W64)"),
   body = c("Discovery cohort defines candidates only",
@@ -66,7 +66,7 @@ oxp <- g("HALLMARK_OXIDATIVE_PHOSPHORYLATION"); dna <- g("HALLMARK_DNA_REPAIR")
 not_sets <- c("GOBP_ASTROCYTE_ACTIVATION", "GOBP_GLIAL_CELL_ACTIVATION", "GOBP_MAINTENANCE_OF_BLOOD_BRAIN_BARRIER")
 col3 <- data.frame(
   title = c("ECM remodelling (up)", "Interferon and NF-κB (up)", "Complement activation (up)", "Angiogenesis (up)",
-            "OXPHOS, DNA repair (down)", "Astrocyte / glial activation, BBB"),
+            "OXPHOS, DNA repair (down)", "Astrocyte/glial activation, BBB upkeep"),
   body = c(sprintf("EMT NES %.2f, FDR %s\nECM organisation FDR %s", emt$NES, fp(emt$padj), fp(ecm$padj)),
            sprintf("IFN-γ FDR %s; TNFα–NF-κB FDR %s", fp(ifn$padj), fp(tnf$padj)),
            sprintf("NES %.2f, FDR %s (C1R, C1S, C3, C1QB, C2)", cmp$NES, fp(cmp$padj)),
@@ -106,7 +106,7 @@ write_source(boxes, out, "evidence_map_boxes")
 headers <- data.frame(
   x = col_x0 + COL_W / 2, y = TOP + 6.5,
   title = c("Cell sources", "Reproducible ALS programme", "Pathway context", "Candidate communication axes"),
-  sub = c("Lineage with highest baseline share (W56)", "Prespecified tests", "Preranked GSEA (W63)", "Ligand–receptor pairs (W65)")
+  sub = c("Lineage with highest baseline share (W56)", "Prespecified tests", "Astrocyte-compartment meta-analysis (W63)", "Ligand–receptor pairs (W65)")
 )
 arrows <- data.frame(x = col_x0[1:3] + COL_W + 0.6, xend = col_x0[2:4] - 0.6, y = (TOP + BOTTOM) / 2 + 3, yend = (TOP + BOTTOM) / 2 + 3)
 
