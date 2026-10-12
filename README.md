@@ -11,7 +11,7 @@ The study derives ALS-up and ALS-down astrocyte-compartment modules from a donor
 | Path | Contents |
 |---|---|
 | `scripts/` | All analysis scripts, Python and R (see the pipeline below) |
-| `scripts/figures_v2/` | R scripts for main Figures 1-5 (ggplot2 + patchwork) |
+| `scripts/figures_v2/` | R scripts for main Figures 1-5 and Supplementary Figures S1-S3 (ggplot2 + patchwork) |
 | `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-7, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
 | `docs/analyses/` | One README per analysis (W32-W62): design, results and reading |
 | `docs/supplementary_tables/` | Supplementary Tables S1-S3, as submitted |
@@ -74,13 +74,13 @@ Run the scripts from the repository root in this order. Each `results/<analysis>
 | **4. Li** | `build_w54_li2023_astrocyte_pseudobulk.py` (uses `w54_marker_annotation.py`) → `run_w54_li2023_motor_cortex_validation.R` → `run_w54_post_hoc_depth.R` | W54 |
 | **5. Masrori** | `run_w53_masrori_astrocyte_lookup.py` | W53 |
 | **6. NYGC bulk hold-out** (confirmatory test 1) | `build_w55_nygc_holdout_inputs.py` → `run_w55_nygc_bulk_holdout.R` → `run_w55_clinical_source_data.R` | W55 |
-| **7. Cell source and ambient RNA** | `build_w56_lineage_pseudobulk.py` → `run_w56_e1_celltype_specificity.py`, `run_w56_e2_celltype_disease_shift.R`, `run_w56_e3_nygc_composition_retest.R`; `build_w57_ambient_inputs.py` → `run_w57_ambient_contamination_test.R` | W56, W57 |
+| **7. Cell source and ambient RNA** | `build_w56_lineage_pseudobulk.py` → `run_w56_e1_celltype_specificity.py`, `run_w56_e2_celltype_disease_shift.R`, `run_w56_e3_nygc_composition_retest.R`; `build_w57_ambient_inputs.py` → `run_w57_ambient_contamination_test.R`; `run_w56_e3_gene_source_data.R` (gene-level E3a results for Supplementary Fig. S3) | W56, W57 |
 | **8. Meta-analysis and consensus** | `build_w58_zelic_astrocyte_pseudobulk.py` → `run_w58_multicohort_meta.R` (uses `w58_cohort_fits.R`) | W58 |
 | **9. Consensus hold-out** (confirmatory test 2) | `run_w59_nygc_consensus_signature_holdout.R` | W59 |
 | **10. Sensitivity and review checks** | `run_w60_age70_sensitivity.R`, `run_w61_small_k_meta_inference.R`, `run_w62_discovery_confounder_audit.R` | W60-W62 |
-| **11. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig5_nygc_holdout.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
+| **11. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig5_nygc_holdout.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
 
-Several scripts check themselves against earlier outputs and stop on mismatch. For example, W60 and W61 reproduce the W58 pools, W62 reproduces the W34 fold changes, and the W55 clinical source data must equal the committed W55 coefficients.
+Several scripts check themselves against earlier outputs and stop on mismatch. For example, W60 and W61 reproduce the W58 pools, W62 reproduces the W34 fold changes, and the W55 clinical and W56 E3a gene-level source data must equal the committed set-level results.
 
 ## Prespecification and version history
 
