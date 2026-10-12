@@ -26,7 +26,10 @@ w66 <- rd("W66_spatial_context", "w66_set_tests.tsv")
 w66 <- w66[w66$analysis == "primary" & w66$unit_type == "whole", ]
 w66_p <- setNames(w66$fry_p, paste(w66$tissue, w66$gene_set))
 lr66 <- rd("W66_spatial_context", "w66_lr_codetection_summary.tsv")
-c3c3ar1 <- setNames(lr66$median_log2_obs_exp_all, lr66$tissue)[lr66$pair == "C3-C3AR1"]
+nul66 <- rd("W66_spatial_context", "post_hoc", "w66_lr_codetection_empirical_null.tsv")
+c3p <- setNames(nul66$empirical_p, nul66$tissue)[nul66$pair == "C3-C3AR1"]
+w67 <- rd("W67_motor_selectivity", "w67_motor_selectivity_tests.tsv")
+w67i <- w67[w67$comparison == "grey_ventral_vs_dorsal_horn" & w67$gene_set == "up" & w67$contrast == "interaction", ]
 
 # ---- column 1: lineage with the highest baseline share of each ALS-up gene (W56 E1, Pineda) ----
 share_cols <- grep("^pineda_share_", names(spec), value = TRUE)
@@ -51,7 +54,8 @@ col2 <- data.frame(
             "snRNA-seq meta-analysis (W58)",
             "Published deconvolution (W64)",
             "Visium spatial, frozen module (W66)",
-            "Visium spatial, consensus (W66)"),
+            "Visium spatial, consensus (W66)",
+            "Ventral vs dorsal horn (W67)"),
   body = c("Discovery cohort defines candidates only",
            sprintf("Motor cortex P = %s; spinal cord P = %s", fp(w55_up[["motor_cortex"]]), fp(w55_up[["spinal_cord"]])),
            sprintf("Up arm: SC P = %s; MC P = %s\nDown arm: MC P = %s; SC P = %s",
@@ -62,10 +66,12 @@ col2 <- data.frame(
            sprintf("Motor cortex P = %s (median log2FC %.2f)\nSpinal cord P = %s (median log2FC %.2f)",
                    fp(w64_p[["motor_cortex"]]), w64$median_logFC[w64$region == "motor_cortex"],
                    fp(w64_p[["spinal_cord"]]), w64$median_logFC[w64$region == "spinal_cord"]),
-           sprintf("Independent donors: SC P = %s; MC P = %s", fp(w66_p[["LSC up"]]), fp(w66_p[["MTC up"]])),
+           sprintf("Whole section: SC P = %s; MC P = %s", fp(w66_p[["LSC up"]]), fp(w66_p[["MTC up"]])),
            sprintf("Up arm: SC P = %s; MC P = %s\nStrongest in astrocyte-dominated spots (SC)",
-                   fp(w66_p[["LSC up_consensus"]]), fp(w66_p[["MTC up_consensus"]]))),
-  tier = c("candidate", "confirmed", "confirmed", "model", "model", "not_supported", "exploratory")
+                   fp(w66_p[["LSC up_consensus"]]), fp(w66_p[["MTC up_consensus"]])),
+           sprintf("Frozen up rises in ventral horn only\n(LTF, ANXA1, GPNMB); interaction\nP = %s (BH %s)",
+                   fp(w67i$fry_p), fp(w67i$fry_BH_primary_family))),
+  tier = c("candidate", "confirmed", "confirmed", "model", "model", "not_supported", "exploratory", "exploratory")
 )
 
 # ---- column 3: pathway context (W63, preranked GSEA on the discovery-agnostic meta statistic) ----
@@ -90,7 +96,7 @@ col3 <- data.frame(
 # ---- column 4: candidate communication axes (W65; liana Consensus; no tests) ----
 col4 <- data.frame(
   title = c("Complement", "Angiopoietin", "Stem-cell factor", "Ephrin and EGF", "Annexin A1"),
-  body = c(sprintf("C3→CR1 higher; C3→C3AR1, LRP1 lower\nC3–C3AR1 spot co-detection, log2 O/E:\nSC %.2f, MC %.2f (W66)", c3c3ar1[["LSC"]], c3c3ar1[["MTC"]]), "ANGPT1→TEK, ITGA5/ITGB1 lower",
+  body = c(sprintf("C3→CR1 higher; C3→C3AR1, LRP1 lower\nC3–C3AR1 co-detected above matched\npairs (W66): SC P = %s, MC P = %s", fp(c3p[["LSC"]]), fp(c3p[["MTC"]])), "ANGPT1→TEK, ITGA5/ITGB1 lower",
            "KITLG→KIT lower; KITLG→EPOR higher", "EFNA5→EPH, EGF→ERBB3/4: mixed",
            "ANXA1→EGFR, DYSF higher"),
   tier = "hypothesis"
@@ -116,7 +122,7 @@ write_source(boxes, out, "evidence_map_boxes")
 headers <- data.frame(
   x = col_x0 + COL_W / 2, y = TOP + 6.5,
   title = c("Cell sources", "Reproducible ALS programme", "Pathway context", "Candidate communication axes"),
-  sub = c("Lineage with highest baseline share (W56)", "Prespecified tests (W55-W66)", "Astrocyte-compartment meta-analysis (W63)", "Ligand–receptor pairs (W65)")
+  sub = c("Lineage with highest baseline share (W56)", "Prespecified tests (W55-W67)", "Astrocyte-compartment meta-analysis (W63)", "Ligand–receptor pairs (W65)")
 )
 arrows <- data.frame(x = col_x0[1:3] + COL_W + 0.6, xend = col_x0[2:4] - 0.6, y = (TOP + BOTTOM) / 2 + 3, yend = (TOP + BOTTOM) / 2 + 3)
 

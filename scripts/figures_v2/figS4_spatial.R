@@ -79,15 +79,25 @@ lr$tissue <- factor(tissue_lab[lr$tissue], levels = tissue_lab)
 lr$group <- factor(lr$group, levels = c("Control", "ALS"))
 pair_order <- with(aggregate(log2_obs_exp ~ pair, lr, median), pair[order(log2_obs_exp)])
 lr$pair <- factor(lr$pair, levels = pair_order)
+nul <- read.delim(file.path(w66, "post_hoc", "w66_lr_codetection_empirical_null.tsv"))
+nul$tissue <- factor(tissue_lab[nul$tissue], levels = tissue_lab)
+nul$pair <- factor(nul$pair, levels = pair_order)
+nul$lab <- paste0("P = ", formatC(nul$empirical_p, format = "fg", digits = 2))
 write_source(lr, out, "panel_d_lr_codetection")
+write_source(nul, out, "panel_d_empirical_null")
 set.seed(20261013)
 pd_ <- ggplot(lr, aes(x = log2_obs_exp, y = pair, colour = group)) +
   geom_vline(xintercept = 0, linewidth = 0.3, colour = PAL$light) +
   geom_jitter(height = 0.18, width = 0, size = 0.55, alpha = 0.75) +
+  geom_point(data = nul, aes(x = random_median, y = pair), inherit.aes = FALSE, shape = 4, size = 1.3, colour = PAL$neutral) +
   stat_summary(fun = median, geom = "point", shape = 124, size = 3, colour = PAL$ink) +
+  geom_text(data = nul, aes(x = 2.35, y = pair, label = lab, fontface = ifelse(empirical_p < 0.05, "bold", "plain")),
+            inherit.aes = FALSE, size = 1.6, family = "Arial", hjust = 1, colour = PAL$ink) +
   facet_grid(. ~ tissue) +
+  coord_cartesian(xlim = c(-0.6, 2.4)) + scale_x_continuous(breaks = c(-0.5, 0, 0.5, 1, 1.5)) +
   scale_colour_manual(values = c(Control = PAL$control, ALS = PAL$als), name = NULL) +
-  labs(x = "Same-spot co-detection, log2 observed / expected", y = NULL, title = "Ligand-receptor co-detection") +
+  labs(x = "Same-spot co-detection, log2 observed / expected", y = NULL,
+       title = "Ligand-receptor co-detection (x, matched random pairs)") +
   theme(legend.position = "top", legend.margin = margin(0, 0, 0, 0))
 
 fig <- (pa | pb) / (pc | pd_) + plot_layout(heights = c(1.15, 1)) + plot_annotation(tag_levels = "a")

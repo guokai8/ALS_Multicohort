@@ -4,16 +4,16 @@ Analysis code for:
 
 > Guo K, Wang Z. *Cross-cohort donor-level analysis reveals a reproducible multicellular glial–vascular ALS transcriptional programme detected in astrocyte compartments.* Manuscript submitted to *Molecular Neurodegeneration*.
 
-The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with nine amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
+The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with ten amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
 
 ## Contents
 
 | Path | Contents |
 |---|---|
 | `scripts/` | All analysis scripts, Python and R (see the pipeline below) |
-| `scripts/figures_v2/` | R scripts for main Figures 1-6 and Supplementary Figures S1-S4 (ggplot2 + patchwork) |
-| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-9, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
-| `docs/analyses/` | One README per analysis (W32-W66): design, results and reading |
+| `scripts/figures_v2/` | R scripts for main Figures 1-6 and Supplementary Figures S1-S5 (ggplot2 + patchwork) |
+| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-10, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
+| `docs/analyses/` | One README per analysis (W32-W67): design, results and reading |
 | `docs/supplementary_tables/` | Supplementary Tables S1-S4 (TSV), as submitted |
 | `metadata/` | Small sample manifests derived from public metadata and read by the scripts |
 
@@ -82,7 +82,8 @@ Run the scripts from the repository root in this order. Each `results/<analysis>
 | **10. Sensitivity and review checks** | `run_w60_age70_sensitivity.R`, `run_w61_small_k_meta_inference.R`, `run_w62_discovery_confounder_audit.R` | W60-W62 |
 | **11. Biological context** (exploratory, Amendment 8) | `run_w63_pathway_context.R`, `run_w64_bulk_published_composition.R` (sources `run_w55_nygc_bulk_holdout.R`), `run_w65_ligand_receptor_context.R` (uses the W56 lineage pseudobulk) | W63-W65 |
 | **12. Spatial context** (exploratory, Amendment 9) | `build_w66_visium_pseudobulk.py` → `run_w66_spatial_disease_tests.R`, `run_w66_spatial_colocalisation.py` | W66 |
-| **13. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig6_evidence_map.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`, `figS4_spatial.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
+| **12b. Spatial sensitivity and motor selectivity** (Amendment 10) | `run_w66_post_hoc_sensitivity.py` (review-prompted); `build_w67_annotation_pseudobulk.py` → `run_w67_motor_selectivity.R` | W66 post hoc, W67 |
+| **13. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig6_evidence_map.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`, `figS4_spatial.R`, `figS5_motor_selectivity.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
 
 Several scripts check themselves against earlier outputs and stop on mismatch. For example, W60 and W61 reproduce the W58 pools, W62 reproduces the W34 fold changes, and the W55 clinical and W56 E3a gene-level source data must equal the committed set-level results.
 
