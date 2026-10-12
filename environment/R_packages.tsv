@@ -1,0 +1,12 @@
+package	version_used
+R	4.5.2
+edgeR	4.8.2
+limma	3.66.0
+metafor	5.2.1
+survival	3.8.6
+readxl	1.4.5
+ggplot2	4.0.3
+patchwork	1.3.2
+svglite	2.2.2
+ragg	1.5.0
+ggrepel	0.9.8

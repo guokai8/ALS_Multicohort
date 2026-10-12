@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the associated article and this repository."
+title: "ALS_Multicohort: cross-cohort donor-level analysis of an ALS astrocyte-compartment transcriptional signature"
+authors:
+  - family-names: Guo
+    given-names: Kai
+  - family-names: Wang
+    given-names: Zhihan
+repository-code: "https://github.com/guokai8/ALS_Multicohort"
+license: MIT
+version: 1.0.0
+date-released: 2026-10-12
+keywords:
+  - ALS
+  - astrocyte
+  - single-nucleus RNA-seq
+  - pseudobulk
+  - meta-analysis
+  - reproducibility

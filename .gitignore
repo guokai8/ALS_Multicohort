@@ -1,0 +1,12 @@
+# Generated outputs and downloaded data are not tracked
+results/
+intermediate/
+pseudobulk/
+data/
+*.h5ad
+*.h5
+*.tsv.gz
+*.csv.gz
+.DS_Store
+__pycache__/
+.Rhistory
