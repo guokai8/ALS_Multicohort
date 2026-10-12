@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Build Supplementary Tables S1-S3 for the v2 multi-cohort manuscript.
+"""Build Supplementary Tables S1-S4 for the v2 multi-cohort manuscript.
 
 S1: frozen analysis plan and amendments, with commit hashes, times and SHA-256.
 S2: registry of every test of the frozen modules and the consensus signature
-    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62).
+    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64).
 S3: deviations from the plan and amendments.
+S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs).
 
 All values are read from committed result tables and from git; nothing is re-computed.
 """
@@ -76,6 +77,7 @@ S1_ROWS = [
     ("_AMENDMENT_5", "Amendment 5", "Second confirmatory test: frozen discovery-agnostic consensus signature in the NYGC hold-out", "W59 consensus-signature hold-out (confirmatory)", "fedddd5"),
     ("_AMENDMENT_6", "Amendment 6", "Restores the plan 5.3 sensitivity: beta_age estimated in donors aged 70 or older for the Ulm age correction", "W60 age >= 70 sensitivity (sensitivity of W58)", "7f16fd3"),
     ("_AMENDMENT_7", "Amendment 7", "Review-prompted checks: HKSJ small-k inference (already observed) and discovery confounder audit with tissue-programme sensitivity", "W61 HKSJ inference; W62 discovery audit (post hoc)", "9342a49"),
+    ("_AMENDMENT_8", "Amendment 8", "Exploratory biological context: themed pathway GSEA, bulk hold-out against published deconvolution, ligand-receptor context", "W63 pathways; W64 published composition; W65 ligand-receptor (exploratory)", "73864d2"),
 ]
 
 
@@ -345,8 +347,21 @@ def w62() -> pd.DataFrame:
                 cohort="NYGC GSE330130 (discovery)", region="MTC", contrast="ALS vs control", effect_type="median logFC")
 
 
+def w64() -> pd.DataFrame:
+    rel = "W64_bulk_published_composition/w64_set_tests.tsv"
+    d = read(rel).rename(columns={"design": "test_id", "n_als_donors": "n_case", "n_control_donors": "n_control",
+                                  "median_logFC": "effect"})
+    d["design"] = d["test_id"].map({"a_st7_replaces_markers": "W55 design; marker scores replaced by NYGC ST7 proportions",
+                                    "b_markers_plus_st7": "W55 design plus NYGC ST7 proportions"}) \
+        + " (" + d["n_composition_covariates"].astype(str) + " covariates)"
+    d["region"] = d["region"].str.replace("_", " ")
+    d["gene_set"] = gene_set_label(d["gene_set"])
+    return rows(d, rel, analysis="W64", phase="Exploratory (Amendment 8)", cohort="NYGC bulk hold-out",
+                contrast="ALS vs control", effect_type="median logFC")
+
+
 def build_s2() -> pd.DataFrame:
-    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62()]
+    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64()]
     return pd.concat([p.astype(object) for p in parts], ignore_index=True)
 
 
@@ -394,6 +409,13 @@ S3_ROWS = [
      "W62 audit and tissue-programme sensitivity (5 of 7 controls from a U54 programme with no ALS)",
      "Post hoc, review-prompted; design and reading fixed in Amendment 7 before running", "W62",
      "results/W62_discovery_confounder_audit/README.md"),
+    ("Amendment 8 W65 (complex score)", "Ligand and receptor log2FC per sender-receiver pair",
+     "For multi-subunit ligands or receptors, the log2FC is the mean over subunits (expression uses the minimum)",
+     "Implementation detail not fixed in Amendment 8; set when writing the script, before any result", "W65",
+     "results/W65_ligand_receptor_context/README.md"),
+    ("Amendment 8 W64 (data handling)", "ST7 proportions as covariates",
+     "Text-stored workbook values coerced to numeric; subregion levels left empty after the ST7 restriction dropped",
+     "Needed for the model to run; no outcome involved", "W64", "results/W64_bulk_published_composition/README.md"),
     ("Pre-plan W50 (M1 controls)", "BA4 plus M1 controls sensitivity", "Dropped",
      "The five M1 control samples are C57BL/6 mouse tissue", "W50", "results/W50_Pineda_final15_validation/README.md"),
 ]
@@ -403,10 +425,21 @@ def build_s3() -> pd.DataFrame:
     return pd.DataFrame(S3_ROWS, columns=["item", "planned", "done", "reason_and_timing", "analysis", "source_file"])
 
 
+# ---------------------------------------------------------------- S4
+def build_s4() -> dict[str, pd.DataFrame]:
+    """Exploratory context tables, copied from the committed W63-W65 outputs."""
+    gsea = pd.concat([read("W63_pathway_context/w63_themed_gsea.tsv"), read("W63_pathway_context/w63_hallmark_gsea.tsv")])
+    return {"S4a_W63_pathway_gsea": gsea,
+            "S4b_W63_consensus_ora": read("W63_pathway_context/w63_consensus_ora.tsv"),
+            "S4c_W64_modules_in_NYGC_ST4": read("W64_bulk_published_composition/w64_module_genes_in_nygc_st4.tsv"),
+            "S4d_W65_pairs_both_cohorts": read("W65_ligand_receptor_context/w65_pairs_in_both_cohorts.tsv")}
+
+
 README_ROWS = [
-    ("Supplementary Table S1", "Frozen analysis plan and seven amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
-    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62). phase gives the status of each test; null and post hoc results are included."),
+    ("Supplementary Table S1", "Frozen analysis plan and eight amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
+    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64). phase gives the status of each test; null and post hoc results are included."),
     ("Supplementary Table S3", "Deviations from the frozen plan and amendments, with reasons and timing."),
+    ("Supplementary Table S4", "Exploratory biological context (Amendment 8): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values)."),
     ("Repository", f"Generated by scripts/build_v2_supplementary_tables.py at commit {git('rev-parse', '--short', 'HEAD')}."),
 ]
 
@@ -414,12 +447,12 @@ README_ROWS = [
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     OUT.mkdir(parents=True, exist_ok=True)
-    tables = {"S1_plan_and_amendments": build_s1(), "S2_test_registry": build_s2(), "S3_deviations": build_s3()}
+    tables = {"S1_plan_and_amendments": build_s1(), "S2_test_registry": build_s2(), "S3_deviations": build_s3(), **build_s4()}
     for name, df in tables.items():
         df.to_csv(OUT / f"Supplementary_Table_{name}.tsv", sep="\t", index=False)
         logger.info("%s: %d rows", name, len(df))
     readme = pd.DataFrame(README_ROWS, columns=["table", "description"])
-    with pd.ExcelWriter(OUT / "Supplementary_Tables_S1-S3.xlsx") as xl:
+    with pd.ExcelWriter(OUT / "Supplementary_Tables_S1-S4.xlsx") as xl:
         readme.to_excel(xl, sheet_name="README", index=False)
         for name, df in tables.items():
             df.to_excel(xl, sheet_name=name.split("_")[0], index=False)
