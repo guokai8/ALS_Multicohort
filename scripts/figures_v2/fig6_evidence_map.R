@@ -22,6 +22,11 @@ w64_p <- setNames(w64$fry_p, w64$region)
 w63 <- rbind(rd("W63_pathway_context", "w63_themed_gsea.tsv"), rd("W63_pathway_context", "w63_hallmark_gsea.tsv"))
 g <- function(set) w63[w63$pathway == set, ][1, ]
 spec <- rd("W56_cell_source_check", "w56_e1_module_gene_specificity.tsv")
+w66 <- rd("W66_spatial_context", "w66_set_tests.tsv")
+w66 <- w66[w66$analysis == "primary" & w66$unit_type == "whole", ]
+w66_p <- setNames(w66$fry_p, paste(w66$tissue, w66$gene_set))
+lr66 <- rd("W66_spatial_context", "w66_lr_codetection_summary.tsv")
+c3c3ar1 <- setNames(lr66$median_log2_obs_exp_all, lr66$tissue)[lr66$pair == "C3-C3AR1"]
 
 # ---- column 1: lineage with the highest baseline share of each ALS-up gene (W56 E1, Pineda) ----
 share_cols <- grep("^pineda_share_", names(spec), value = TRUE)
@@ -44,7 +49,9 @@ col2 <- data.frame(
             "Bulk hold-out, frozen module (W55)",
             "Bulk hold-out, 158-gene consensus (W59)",
             "snRNA-seq meta-analysis (W58)",
-            "Published deconvolution (W64)"),
+            "Published deconvolution (W64)",
+            "Visium spatial, frozen module (W66)",
+            "Visium spatial, consensus (W66)"),
   body = c("Discovery cohort defines candidates only",
            sprintf("Motor cortex P = %s; spinal cord P = %s", fp(w55_up[["motor_cortex"]]), fp(w55_up[["spinal_cord"]])),
            sprintf("Up arm: SC P = %s; MC P = %s\nDown arm: MC P = %s; SC P = %s",
@@ -54,8 +61,11 @@ col2 <- data.frame(
                    w61$pooled_d, fp(w61$z_p), fp(w61$hksj_p)),
            sprintf("Motor cortex P = %s (median log2FC %.2f)\nSpinal cord P = %s (median log2FC %.2f)",
                    fp(w64_p[["motor_cortex"]]), w64$median_logFC[w64$region == "motor_cortex"],
-                   fp(w64_p[["spinal_cord"]]), w64$median_logFC[w64$region == "spinal_cord"])),
-  tier = c("candidate", "confirmed", "confirmed", "model", "model")
+                   fp(w64_p[["spinal_cord"]]), w64$median_logFC[w64$region == "spinal_cord"]),
+           sprintf("Independent donors: SC P = %s; MC P = %s", fp(w66_p[["LSC up"]]), fp(w66_p[["MTC up"]])),
+           sprintf("Up arm: SC P = %s; MC P = %s\nStrongest in astrocyte-dominated spots (SC)",
+                   fp(w66_p[["LSC up_consensus"]]), fp(w66_p[["MTC up_consensus"]]))),
+  tier = c("candidate", "confirmed", "confirmed", "model", "model", "not_supported", "exploratory")
 )
 
 # ---- column 3: pathway context (W63, preranked GSEA on the discovery-agnostic meta statistic) ----
@@ -80,7 +90,7 @@ col3 <- data.frame(
 # ---- column 4: candidate communication axes (W65; liana Consensus; no tests) ----
 col4 <- data.frame(
   title = c("Complement", "Angiopoietin", "Stem-cell factor", "Ephrin and EGF", "Annexin A1"),
-  body = c("C3→CR1 higher; C3→C3AR1, LRP1 lower", "ANGPT1→TEK, ITGA5/ITGB1 lower",
+  body = c(sprintf("C3→CR1 higher; C3→C3AR1, LRP1 lower\nC3–C3AR1 spot co-detection, log2 O/E:\nSC %.2f, MC %.2f (W66)", c3c3ar1[["LSC"]], c3c3ar1[["MTC"]]), "ANGPT1→TEK, ITGA5/ITGB1 lower",
            "KITLG→KIT lower; KITLG→EPOR higher", "EFNA5→EPH, EGF→ERBB3/4: mixed",
            "ANXA1→EGFR, DYSF higher"),
   tier = "hypothesis"
@@ -106,7 +116,7 @@ write_source(boxes, out, "evidence_map_boxes")
 headers <- data.frame(
   x = col_x0 + COL_W / 2, y = TOP + 6.5,
   title = c("Cell sources", "Reproducible ALS programme", "Pathway context", "Candidate communication axes"),
-  sub = c("Lineage with highest baseline share (W56)", "Prespecified tests", "Astrocyte-compartment meta-analysis (W63)", "Ligand–receptor pairs (W65)")
+  sub = c("Lineage with highest baseline share (W56)", "Prespecified tests (W55-W66)", "Astrocyte-compartment meta-analysis (W63)", "Ligand–receptor pairs (W65)")
 )
 arrows <- data.frame(x = col_x0[1:3] + COL_W + 0.6, xend = col_x0[2:4] - 0.6, y = (TOP + BOTTOM) / 2 + 3, yend = (TOP + BOTTOM) / 2 + 3)
 

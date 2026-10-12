@@ -3,9 +3,9 @@
 
 S1: frozen analysis plan and amendments, with commit hashes, times and SHA-256.
 S2: registry of every test of the frozen modules and the consensus signature
-    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64).
+    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64, W66).
 S3: deviations from the plan and amendments.
-S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs).
+S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs, W66 spatial).
 
 All values are read from committed result tables and from git; nothing is re-computed.
 """
@@ -78,6 +78,7 @@ S1_ROWS = [
     ("_AMENDMENT_6", "Amendment 6", "Restores the plan 5.3 sensitivity: beta_age estimated in donors aged 70 or older for the Ulm age correction", "W60 age >= 70 sensitivity (sensitivity of W58)", "7f16fd3"),
     ("_AMENDMENT_7", "Amendment 7", "Review-prompted checks: HKSJ small-k inference (already observed) and discovery confounder audit with tissue-programme sensitivity", "W61 HKSJ inference; W62 discovery audit (post hoc)", "9342a49"),
     ("_AMENDMENT_8", "Amendment 8", "Exploratory biological context: themed pathway GSEA, bulk hold-out against published deconvolution, ligand-receptor context", "W63 pathways; W64 published composition; W65 ligand-receptor (exploratory)", "73864d2"),
+    ("_AMENDMENT_9", "Amendment 9", "Exploratory spatial context in GSE330224 Visium: donor pseudobulk disease tests, lineage niches, co-localisation, ligand-receptor co-detection", "W66 spatial context (exploratory)", "89c7c6a"),
 ]
 
 
@@ -360,8 +361,20 @@ def w64() -> pd.DataFrame:
                 contrast="ALS vs control", effect_type="median logFC")
 
 
+def w66() -> pd.DataFrame:
+    rel = "W66_spatial_context/w66_set_tests.tsv"
+    d = read(rel).rename(columns={"n_als": "n_case", "median_logFC": "effect", "fry_BH_primary_family": "fdr"})
+    d["test_id"] = d["analysis"] + ":" + d["unit_type"] + ":" + d["stratum"]
+    d["cohort"] = "GSE330224 Visium " + d["tissue"] + d["analysis"].map(lambda a: " (incl. GSE330130 donors)" if a == "sens_all_donors" else "")
+    d["region"] = d["stratum"]
+    d["phase"] = d["analysis"].map(lambda a: "Exploratory (Amendment 9)" if a == "primary" else "Exploratory sensitivity (Amendment 9)")
+    d["gene_set"] = gene_set_label(d["gene_set"])
+    d["fdr_family"] = d["fdr"].map(lambda x: "" if pd.isna(x) else "fry BH over 4 tests (frozen modules, whole unit, both tissues)")
+    return rows(d, rel, analysis="W66", contrast="ALS vs non-neurological control", effect_type="median logFC")
+
+
 def build_s2() -> pd.DataFrame:
-    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64()]
+    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64(), w66()]
     return pd.concat([p.astype(object) for p in parts], ignore_index=True)
 
 
@@ -416,6 +429,10 @@ S3_ROWS = [
     ("Amendment 8 W64 (data handling)", "ST7 proportions as covariates",
      "Text-stored workbook values coerced to numeric; subregion levels left empty after the ST7 restriction dropped",
      "Needed for the model to run; no outcome involved", "W64", "results/W64_bulk_published_composition/README.md"),
+    ("Amendment 9 W66 (lineage niches)", "Niche = lineage score >= section 75th percentile; astrocyte_only also requires vascular and microglia scores below the section median",
+     "Niches use spots with >= 500 total counts; 'rich' also requires a score > 0; 'below the median' became 'at or below the median'",
+     "Markers are zero in most low-count spots (median vascular and microglia scores 0 in 95 of 137 LSC sections), so the written rule left astrocyte_only nearly empty; changed after building the inputs and before any disease test",
+     "W66", "results/W66_spatial_context/README.md"),
     ("Pre-plan W50 (M1 controls)", "BA4 plus M1 controls sensitivity", "Dropped",
      "The five M1 control samples are C57BL/6 mouse tissue", "W50", "results/W50_Pineda_final15_validation/README.md"),
 ]
@@ -432,14 +449,17 @@ def build_s4() -> dict[str, pd.DataFrame]:
     return {"S4a_W63_pathway_gsea": gsea,
             "S4b_W63_consensus_ora": read("W63_pathway_context/w63_consensus_ora.tsv"),
             "S4c_W64_modules_in_NYGC_ST4": read("W64_bulk_published_composition/w64_module_genes_in_nygc_st4.tsv"),
-            "S4d_W65_pairs_both_cohorts": read("W65_ligand_receptor_context/w65_pairs_in_both_cohorts.tsv")}
+            "S4d_W65_pairs_both_cohorts": read("W65_ligand_receptor_context/w65_pairs_in_both_cohorts.tsv"),
+            "S4e_W66_region_share": read("W66_spatial_context/w66_region_share.tsv"),
+            "S4f_W66_colocalisation": read("W66_spatial_context/w66_colocalisation_summary.tsv"),
+            "S4g_W66_lr_codetection": read("W66_spatial_context/w66_lr_codetection_summary.tsv")}
 
 
 README_ROWS = [
-    ("Supplementary Table S1", "Frozen analysis plan and eight amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
-    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64). phase gives the status of each test; null and post hoc results are included."),
+    ("Supplementary Table S1", "Frozen analysis plan and nine amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
+    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64, W66). phase gives the status of each test; null and post hoc results are included."),
     ("Supplementary Table S3", "Deviations from the frozen plan and amendments, with reasons and timing."),
-    ("Supplementary Table S4", "Exploratory biological context (Amendment 8): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values)."),
+    ("Supplementary Table S4", "Exploratory biological context (Amendments 8 and 9): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values); S4e-S4g GSE330224 Visium region share, spot co-localisation and ligand-receptor co-detection (W66, Amendment 9)."),
     ("Repository", f"Generated by scripts/build_v2_supplementary_tables.py at commit {git('rev-parse', '--short', 'HEAD')}."),
 ]
 
