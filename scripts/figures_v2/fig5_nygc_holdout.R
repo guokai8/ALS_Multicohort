@@ -90,5 +90,6 @@ pc2 <- ggplot(sc, aes(x = score_sd, y = duration_months)) +
        title = sprintf("Spinal cord, ALS-down (n = %d)", nrow(sc)))
 
 fig <- ((pa | pb) / (pc1 | pc2)) + plot_layout(heights = c(1.25, 1)) + plot_annotation(tag_levels = list(c("a", "b", "c", "")))
+save_panels(list(pa = pa, pb = pb, pc1 = pc1, pc2 = pc2), "Figure5_NYGC_bulk_holdout")
 save_pub_r(fig, out, "Figure5_NYGC_bulk_holdout", width_mm = 183, height_mm = 140)
 cat("Fig. 5 written to", out, "\n")

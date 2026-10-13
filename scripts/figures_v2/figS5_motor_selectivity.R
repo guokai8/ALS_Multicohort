@@ -55,5 +55,6 @@ pb <- ggplot(g, aes(x = logFC, y = symbol)) +
   theme(legend.position = "top", legend.margin = margin(0, 0, 0, 0), legend.box = "vertical")
 
 fig <- (pa | pb) + plot_layout(widths = c(2, 1)) + plot_annotation(tag_levels = "a")
+save_panels(list(pa = pa, pb = pb), "FigureS5_motor_selectivity")
 save_pub_r(fig, out, "FigureS5_motor_selectivity", width_mm = 183, height_mm = 105)
 cat("Supplementary Fig. S5 written to", out, "\n")

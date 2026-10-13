@@ -149,5 +149,6 @@ pc <- ggplot() +
   theme(plot.tag = element_text(size = 8, face = "bold"))
 
 fig <- (pa | pb) / pc + plot_layout(heights = c(1.15, 1), widths = c(1.15, 1)) + plot_annotation(tag_levels = "a")
+save_panels(list(pa = pa, pb = pb, pc = pc), "Figure1_study_design")
 save_pub_r(fig, out, "Figure1_study_design", width_mm = 183, height_mm = 150)
 cat("Fig. 1 written to", out, "\n")

@@ -102,5 +102,6 @@ pd_ <- ggplot(lr, aes(x = log2_obs_exp, y = pair, colour = group)) +
 
 fig <- (pa | pb) / (pc | pd_) + plot_layout(heights = c(1.15, 1)) + plot_annotation(tag_levels = "a")
 fig[[1]] <- fig[[1]] + plot_layout(widths = c(1.55, 1))
+save_panels(list(pa = pa, pb = pb, pc = pc, pd = pd_), "FigureS4_spatial")
 save_pub_r(fig, out, "FigureS4_spatial", width_mm = 183, height_mm = 190)
 cat("Supplementary Fig. S4 written to", out, "\n")

@@ -42,5 +42,6 @@ pa <- ggplot(g, aes(x = logFC, y = gene)) +
        title = "Frozen module genes in the bulk hold-out") +
   theme(legend.position = "bottom", strip.text.y = element_text(angle = 0, hjust = 0))
 
+save_panels(list(pa = pa), "FigureS3_holdout_genes")
 save_pub_r(pa, out, "FigureS3_holdout_genes", width_mm = 183, height_mm = 130)
 cat("Fig. S3 written to", out, "\n")

@@ -162,5 +162,6 @@ fig <- ggplot() +
   theme(legend.position = "bottom", legend.text = element_text(size = 5.6), legend.key.size = unit(2.6, "mm"),
         legend.margin = margin(0, 0, 0, 0), plot.margin = margin(1, 1, 1, 1))
 
+save_panels(list(fig = fig), "Figure6_evidence_map")
 save_pub_r(fig, out, "Figure6_evidence_map", width_mm = 183, height_mm = H - BOTTOM + 8)
 cat("Fig. 6 written to", out, "\n")

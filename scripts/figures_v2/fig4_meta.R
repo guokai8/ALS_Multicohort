@@ -59,6 +59,9 @@ cohorts <- fa[!fa$kind %in% c("pool", "pool_sens"), ]
 x_range <- data.frame(module = factor(rep(levels(fa$module), each = 2), levels = levels(fa$module)), x = c(-1.2, 4.6, -7, 1.5))
 note_x <- c("ALS-up module" = 1.5, "ALS-down module" = -6.9)  # inside the empty side of each panel
 mod_col <- c("ALS-up module" = PAL$up, "ALS-down module" = PAL$down)
+pools$note_x <- note_x[as.character(pools$module)]  # stored as columns so that saved panels are self-contained
+disc_df <- data.frame(module = factor(names(disc_note), levels = levels(fa$module)), label = disc_note)
+disc_df$note_x <- note_x[as.character(disc_df$module)]; disc_df$y <- length(rows) + 0.45
 pa <- ggplot() +
   geom_vline(xintercept = 0, linewidth = 0.3, colour = PAL$neutral) +
   annotate("rect", xmin = -Inf, xmax = Inf, ymin = 0.5, ymax = length(pool_lab) + 0.5, fill = "#F3F3F3") +
@@ -66,9 +69,8 @@ pa <- ggplot() +
   geom_point(data = cohorts, aes(y = row, x = d, colour = module, shape = kind), size = 1.5, fill = "white", stroke = 0.45) +
   geom_polygon(data = dia, aes(x = x, y = y, group = id, fill = module, alpha = kind), colour = PAL$ink, linewidth = 0.25) +
   geom_blank(data = x_range, aes(x = x)) +
-  geom_text(data = pools, aes(y = row, x = note_x[as.character(module)], label = note), hjust = 0, size = 1.75, family = "Arial") +
-  geom_text(data = data.frame(module = factor(names(disc_note), levels = levels(fa$module)), label = disc_note),
-            aes(x = note_x[as.character(module)], y = length(rows) + 0.45, label = label), hjust = 0, size = 1.75, family = "Arial", colour = PAL$neutral) +
+  geom_text(data = pools, aes(y = row, x = note_x, label = note), hjust = 0, size = 1.75, family = "Arial") +
+  geom_text(data = disc_df, aes(x = note_x, y = y, label = label), hjust = 0, size = 1.75, family = "Arial", colour = PAL$neutral) +
   facet_wrap(~ module, nrow = 1, scales = "free_x") +
   scale_colour_manual(values = mod_col, guide = "none") +
   scale_fill_manual(values = mod_col, guide = "none") +
@@ -108,5 +110,6 @@ pb <- ggplot(gw, aes(x = meta_logFC, y = neglog10(meta_p))) +
   theme(legend.position = c(0.02, 0.98), legend.justification = c(0, 1), legend.key.size = unit(2.4, "mm"))
 
 fig <- (pa / free(pb)) + plot_layout(heights = c(1.15, 1.1)) + plot_annotation(tag_levels = "a")
+save_panels(list(pa = pa, pb = pb), "Figure4_meta_analysis")
 save_pub_r(fig, out, "Figure4_meta_analysis", width_mm = 183, height_mm = 160)
 cat("Fig. 4 written to", out, "\n")

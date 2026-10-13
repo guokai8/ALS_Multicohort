@@ -22,5 +22,6 @@ p <- ggplot(d, aes(x = mn_index, y = module_response)) +
   labs(x = "Motor-neuron index (motor-territory mean log2-CPM; lower = more loss)",
        y = "Module response (motor minus sensory territory, log2-CPM)") +
   theme(legend.position = "top", legend.margin = margin(0, 0, 0, 0), strip.text.y = element_text(angle = 0, hjust = 0))
+save_panels(list(pa = p), "FigureS6_dose_response")
 save_pub_r(p, out, "FigureS6_dose_response", width_mm = 140, height_mm = 100)
 cat("Supplementary Fig. S6 written to", out, "\n")

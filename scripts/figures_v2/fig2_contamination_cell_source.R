@@ -63,5 +63,6 @@ pc <- ggplot(long, aes(x = lineage, y = gene, fill = share)) +
         strip.text.y = element_text(angle = 0, hjust = 0))
 
 fig <- (pc | (pa / pb)) + plot_layout(widths = c(1.05, 1)) + plot_annotation(tag_levels = "a")
+save_panels(list(pa = pa, pb = pb, pc = pc), "Figure2_contamination_cell_source")
 save_pub_r(fig, out, "Figure2_contamination_cell_source", width_mm = 183, height_mm = 125)
 cat("Fig. 2 written to", out, "\n")

@@ -39,7 +39,7 @@ pb <- ggplot(bv, aes(x = prefix_R2_top5PC, y = label)) +
   geom_col(aes(fill = perm_p < 0.05), width = 0.62) +
   geom_text(aes(label = p_label), hjust = -0.1, size = 1.8, family = "Arial") +
   scale_fill_manual(values = c(`TRUE` = PAL$ink, `FALSE` = PAL$light), guide = "none") +
-  scale_x_continuous(limits = c(0, 0.8), breaks = seq(0, 0.6, 0.2), expand = expansion(mult = c(0, 0))) +
+  scale_x_continuous(limits = c(0, 0.95), breaks = seq(0, 0.6, 0.2), expand = expansion(mult = c(0, 0))) +
   labs(x = expression(R^2~"of processing date (top 5 PCs)"), y = NULL, title = "Date effect within diagnosis")
 
 # ---- c: Ulm age imbalance and age-bias correction ----
@@ -127,5 +127,6 @@ pc1 <- pc1 + labs(tag = "c"); pd1 <- pd1 + labs(tag = "d")
 top <- (pa | pb | pe) + plot_layout(widths = c(0.75, 1, 1.15))
 bottom <- (pc1 | pc2 | pd1 | pd2) + plot_layout(widths = c(0.8, 0.8, 0.8, 1.25))
 fig <- top / bottom + plot_layout(heights = c(1.25, 1))
+save_panels(list(pa = pa, pb = pb, pc1 = pc1, pc2 = pc2, pd1 = pd1, pd2 = pd2, pe = pe), "Figure3_cohort_confounding")
 save_pub_r(fig, out, "Figure3_cohort_confounding", width_mm = 183, height_mm = 125)
 cat("Fig. 3 written to", out, "\n")

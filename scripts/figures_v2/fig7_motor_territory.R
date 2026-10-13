@@ -67,7 +67,7 @@ pb <- ggplot(g, aes(x = logFC, y = symbol)) +
   scale_x_continuous(breaks = c(0, 1, 2, 3)) +
   scale_colour_manual(values = c(Motor = PAL$als, Sensory = PAL$control), name = NULL) +
   scale_shape_manual(values = c(`P < 0.05` = 16, `P >= 0.05` = 1), name = NULL) +
-  labs(x = "log2 fold change, ALS vs control", y = NULL, title = "Module genes in spinal grey matter") +
+  labs(x = "log2 fold change, ALS vs control", y = NULL, title = "Module genes") +
   theme(legend.position = "top", legend.margin = margin(0, 0, 0, 0), legend.box = "vertical")
 
 # ---- c: protein co-localisation (W68 C) ----
@@ -87,5 +87,6 @@ pc <- ggplot(pc_d, aes(x = rho_depth_partial, y = protein)) +
   theme(legend.position = "top", legend.margin = margin(0, 0, 0, 0))
 
 fig <- (pa | pb | pc) + plot_layout(widths = c(1.35, 1, 0.9)) + plot_annotation(tag_levels = "a")
+save_panels(list(pa = pa, pb = pb, pc = pc), "Figure7_motor_territory")
 save_pub_r(fig, out, "Figure7_motor_territory", width_mm = 183, height_mm = 95)
 cat("Fig. 7 written to", out, "\n")

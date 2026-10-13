@@ -59,6 +59,7 @@ e2 <- droplevels(e2)
 e2$label <- sprintf("P = %s (%d genes)", formatC(e2$fry_p, format = "fg", digits = 2), e2$n_genes_tested)
 write_source(e2, out, "panel_c_lineage_disease_shift")
 x_lab <- max(abs(e2$median_logFC)) * 1.25
+e2$x_lab <- x_lab  # stored as a column so that saved panels are self-contained
 dodge <- position_dodge(width = 0.55, orientation = "y")
 pc <- ggplot(e2, aes(x = median_logFC, y = lineage, colour = module, group = module)) +
   geom_vline(xintercept = 0, linewidth = 0.3, colour = PAL$light) +
@@ -72,5 +73,6 @@ pc <- ggplot(e2, aes(x = median_logFC, y = lineage, colour = module, group = mod
   theme(strip.text = element_text(hjust = 0), plot.margin = margin(4, 62, 4, 4))
 
 fig <- (pa | (pb / pc + plot_layout(heights = c(1, 1.15)))) + plot_layout(widths = c(0.9, 1.1)) + plot_annotation(tag_levels = "a")
+save_panels(list(pa = pa, pb = pb, pc = pc), "FigureS2_cell_source")
 save_pub_r(fig, out, "FigureS2_cell_source", width_mm = 183, height_mm = 150)
 cat("Fig. S2 written to", out, "\n")

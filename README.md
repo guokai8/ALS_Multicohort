@@ -2,7 +2,7 @@
 
 Analysis code for:
 
-> Guo K, Wang Z. *Cross-cohort donor-level analysis reveals a reproducible multicellular glial–vascular ALS transcriptional programme detected in astrocyte compartments.* Manuscript submitted to *Molecular Neurodegeneration*.
+> Guo K, Wang Z. *Prespecified cross-cohort testing localises an astrocyte-compartment ALS signature to a multicellular myeloid–glial response in the spinal ventral horn.* Manuscript submitted to *Molecular Neurodegeneration*.
 
 The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with twelve amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
 
@@ -11,7 +11,7 @@ The study uses a donor-level discovery cohort (GSE330130) only to define candida
 | Path | Contents |
 |---|---|
 | `scripts/` | All analysis scripts, Python and R (see the pipeline below) |
-| `scripts/figures_v2/` | R scripts for main Figures 1-7 and Supplementary Figures S1-S6 (ggplot2 + patchwork) |
+| `scripts/figures_v2/` | R panel scripts (ggplot2 + patchwork); `compose_figures_v3.R` assembles the submitted main Figures 1-5 and Supplementary Figures S1-S8 |
 | `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-12, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
 | `docs/analyses/` | One README per analysis (W32-W69): design, results and reading |
 | `docs/supplementary_tables/` | Supplementary Tables S1-S4 (TSV), as submitted |

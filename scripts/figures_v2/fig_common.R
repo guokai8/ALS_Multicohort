@@ -71,3 +71,10 @@ save_pub_r <- function(plot, dir, name, width_mm = 183, height_mm = 120, dpi = 6
 }
 
 neglog10 <- function(p) -log10(pmax(p, 1e-300))
+
+# Panel objects are also saved so that compose_figures_v3.R can assemble the streamlined figure set.
+save_panels <- function(panels, name) {
+  d <- file.path(FIG_OUT, "panels")
+  dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  saveRDS(panels, file.path(d, paste0(name, ".rds")))
+}

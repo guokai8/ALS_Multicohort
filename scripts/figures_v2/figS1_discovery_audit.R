@@ -77,5 +77,6 @@ pd <- ggplot(sc, aes(x = group, y = score, colour = group)) +
 
 fig <- ((pa | pb) + plot_layout(widths = c(0.7, 1.3))) / ((pc | pd) + plot_layout(widths = c(1, 1.2))) +
   plot_annotation(tag_levels = "a")
+save_panels(list(pa = pa, pb = pb, pc = pc, pd = pd), "FigureS1_discovery_audit")
 save_pub_r(fig, out, "FigureS1_discovery_audit", width_mm = 183, height_mm = 140)
 cat("Fig. S1 written to", out, "\n")
