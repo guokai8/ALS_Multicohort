@@ -3,9 +3,9 @@
 
 S1: frozen analysis plan and amendments, with commit hashes, times and SHA-256.
 S2: registry of every test of the frozen modules and the consensus signature
-    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64, W66-W69).
+    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64, W66-W70).
 S3: deviations from the plan and amendments.
-S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs, W66 spatial, W67 motor-system selectivity, W68 independent spatial replication, W69 dose-response and cross-cohort combination).
+S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs, W66 spatial, W67 motor-system selectivity, W68 independent spatial replication, W69 dose-response and cross-cohort combination, W70 microglia-adjusted territory test).
 
 All values are read from committed result tables and from git; nothing is re-computed.
 """
@@ -82,6 +82,7 @@ S1_ROWS = [
     ("_AMENDMENT_10", "Amendment 10", "Review-prompted W66 sensitivity (empirical co-detection null, depth-partial co-localisation; already observed) and W67 motor- vs sensory-territory test (fixed before running)", "W66 post hoc; W67 motor-system selectivity (exploratory)", "96335a5"),
     ("_AMENDMENT_11", "Amendment 11", "Replication of motor-territory selectivity in an independent spatial cohort (GSE288365 Visium CytAssist cervical cord), with motor-neuron proximity and protein co-localisation", "W68 independent spatial replication (exploratory)", "7f9c562"),
     ("_AMENDMENT_12", "Amendment 12", "Dose-response of the motor-territory response with motor-neuron loss (fixed before running) and Stouffer combination of the W67 and W68 territory tests (post hoc summary of known results)", "W69 (exploratory; B post hoc)", "1c819a7"),
+    ("_AMENDMENT_13", "Amendment 13", "Territory x disease interaction adjusted for a unit-level microglial score (all, homeostatic and activated marker sets), with prespecified combination and attenuation reading", "W70 microglia-adjusted territory test (exploratory)", "954b138"),
 ]
 
 
@@ -422,8 +423,19 @@ def w69() -> pd.DataFrame:
     return pd.concat([a, b])
 
 
+def w70() -> pd.DataFrame:
+    rel = "W70_microglia_adjusted_territory/w70_adjusted_interaction_tests.tsv"
+    d = read(rel).rename(columns={"n_als": "n_case", "median_logFC_interaction": "effect"})
+    d["test_id"] = d["cohort"] + ":" + d["score"] + "_adjusted:interaction"
+    d["design"] = "W67/W68 interaction model + unit-level " + d["score"] + " marker score; attenuation vs unadjusted = " + d["attenuation"].round(2).astype(str)
+    d["gene_set"] = gene_set_label(d["gene_set"])
+    d["cohort"] = d["cohort"].map({"lumbar_GSE330224": "GSE330224 Visium LSC", "cervical_GSE288365": "GSE288365 Visium CytAssist cervical cord"})
+    return rows(d, rel, analysis="W70", phase="Exploratory (Amendment 13)", region="motor vs sensory grey matter",
+                contrast="Territory x disease interaction", effect_type="median logFC (interaction)")
+
+
 def build_s2() -> pd.DataFrame:
-    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64(), w66(), w67(), w68(), w69()]
+    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64(), w66(), w67(), w68(), w69(), w70()]
     return pd.concat([p.astype(object) for p in parts], ignore_index=True)
 
 
@@ -517,14 +529,16 @@ def build_s4() -> dict[str, pd.DataFrame]:
             "S4h_W67_territory_genes": read("W67_motor_selectivity/w67_module_gene_results.tsv"),
             "S4i_W68_territory_genes": read("W68_GSE288365_replication/w68_module_gene_results.tsv"),
             "S4j_W68_protein_coloc": read("W68_GSE288365_replication/w68_protein_colocalisation_summary.tsv"),
-            "S4k_W69_dose_response_donors": read("W69_dose_response_and_combination/w69a_donor_values.tsv")}
+            "S4k_W69_dose_response_donors": read("W69_dose_response_and_combination/w69a_donor_values.tsv"),
+            "S4l_W70_microglia_adjusted": read("W70_microglia_adjusted_territory/w70_combined_reading.tsv"),
+            "S4m_W70_microglial_score": read("W70_microglia_adjusted_territory/w70_microglial_score_by_territory.tsv")}
 
 
 README_ROWS = [
-    ("Supplementary Table S1", "Frozen analysis plan and twelve amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
-    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64, W66-W69). phase gives the status of each test; null and post hoc results are included."),
+    ("Supplementary Table S1", "Frozen analysis plan and thirteen amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
+    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64, W66-W70). phase gives the status of each test; null and post hoc results are included."),
     ("Supplementary Table S3", "Deviations from the frozen plan and amendments, with reasons and timing."),
-    ("Supplementary Table S4", "Exploratory biological context (Amendments 8-12): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values); S4e-S4g GSE330224 Visium region share, spot co-localisation and ligand-receptor co-detection with its matched-random-pair null (W66, Amendments 9 and 10); S4h gene-level ALS effects in motor and sensory spinal-cord territories (W67, Amendment 10); S4i the same in the independent GSE288365 cohort and S4j spot-level protein co-localisation there (W68, Amendment 11); S4k donor-level motor-neuron index and module response (W69, Amendment 12)."),
+    ("Supplementary Table S4", "Exploratory biological context (Amendments 8-13): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values); S4e-S4g GSE330224 Visium region share, spot co-localisation and ligand-receptor co-detection with its matched-random-pair null (W66, Amendments 9 and 10); S4h gene-level ALS effects in motor and sensory spinal-cord territories (W67, Amendment 10); S4i the same in the independent GSE288365 cohort and S4j spot-level protein co-localisation there (W68, Amendment 11); S4k donor-level motor-neuron index and module response (W69, Amendment 12); S4l-S4m microglia-adjusted territory interaction and microglial score by territory (W70, Amendment 13)."),
     ("Repository", f"Generated by scripts/build_v2_supplementary_tables.py at commit {git('rev-parse', '--short', 'HEAD')}."),
 ]
 

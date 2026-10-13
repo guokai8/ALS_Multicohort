@@ -11,7 +11,7 @@ boxes <- data.frame(
   y = c(6, 5, 4, 3, 2, 3, 1, 2),
   label = c("Discovery: GSE330130 motor cortex\nastrocyte-compartment pseudobulk (11 ALS / 7 ctrl)",
             "Frozen modules: 15 ALS-up / 14 ALS-down genes",
-            "Frozen analysis plan v1.0 + Amendments 1-12\n(committed before each governed analysis)",
+            "Frozen analysis plan v1.0 + Amendments 1-13\n(committed before each governed analysis)",
             "Independent snRNA-seq:\n5 contrasts from 4 studies",
             "Meta-analysis +\n159-gene consensus signature",
             "NYGC bulk hold-out:\nfrozen modules (test 1)",
@@ -43,7 +43,7 @@ pa <- ggplot() +
 log_lines <- system2("git", c("-C", shQuote(FIG_ROOT), "log", "--reverse", shQuote("--format=%h|%ad|%s"), shQuote("--date=format:%Y-%m-%d %H:%M"), "841cd1a..HEAD"), stdout = TRUE)
 log <- do.call(rbind, lapply(strsplit(log_lines, "\\|"), function(x) data.frame(hash = x[1], time = x[2], subject = x[3])))
 events <- data.frame(
-  hash = c("267949d", "b7266f0", "02f1136", "2861aef", "dfa6954", "9b1fd37", "bbd5e98", "8ce592d", "4624cc1", "957a06a", "5605120", "fedddd5", "896ce41", "7f16fd3", "284d22c", "9342a49", "b6b8c94", "73864d2", "0576362", "89c7c6a", "ed60da9", "96335a5", "c5af36b", "7f9c562", "1e4c470", "1c819a7"),
+  hash = c("267949d", "b7266f0", "02f1136", "2861aef", "dfa6954", "9b1fd37", "bbd5e98", "8ce592d", "4624cc1", "957a06a", "5605120", "fedddd5", "896ce41", "7f16fd3", "284d22c", "9342a49", "b6b8c94", "73864d2", "0576362", "89c7c6a", "ed60da9", "96335a5", "c5af36b", "7f9c562", "1e4c470", "1c819a7", "edde685", "954b138"),
   label = c("W50-W54 external checks (observed before plan)", "Plan v1.0 frozen", "Amendment 1 (hold-out implementation)",
             "W55 bulk hold-out: frozen modules", "Amendment 2 (cell source)", "W56 cell-source checks",
             "Amendment 3 (ambient RNA)", "W57 ambient-RNA test", "Amendment 4 (meta-analysis)", "W58 meta-analysis",
@@ -54,8 +54,9 @@ events <- data.frame(
             "Amendment 9 (spatial context)", "W66 Visium spatial context",
             "Amendment 10 (W66 sensitivity; motor selectivity)", "W66 post hoc; W67 motor vs sensory territory",
             "Amendment 11 (independent spatial replication)", "W68 GSE288365 replication",
-            "Amendment 12 (dose-response; combination)", "W69 dose-response; cross-cohort combination"),
-  kind = c("prior", "plan", "plan", "confirmatory", "plan", "exploratory", "plan", "exploratory", "plan", "consolidation", "plan", "confirmatory", "plan", "consolidation", "plan", "consolidation", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory")
+            "Amendment 12 (dose-response; combination)", "W69 dose-response; cross-cohort combination",
+            "Amendment 13 (microglia-adjusted territory test)", "W70 microglia-adjusted territory test"),
+  kind = c("prior", "plan", "plan", "confirmatory", "plan", "exploratory", "plan", "exploratory", "plan", "consolidation", "plan", "confirmatory", "plan", "consolidation", "plan", "consolidation", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory")
 )
 log$commit_index <- seq_len(nrow(log))
 events <- merge(events, log, by = "hash")

@@ -1,0 +1,7 @@
+score	gene_set	both_up	stouffer_p_one_sided	max_attenuation	reading
+activated	up	True	0.06898932905727	0.83635551105734	largely shared with microglial abundance
+homeostatic	up	True	0.001449635130585	0.50265499153854	partly shared with microglial abundance
+microglia	up	True	0.0202334109080429	0.749356142824572	partly shared with microglial abundance
+activated	up_consensus	True	0.0164070104262835	0.239033261768382	not explained by microglial abundance
+homeostatic	up_consensus	True	0.0005126801229352	-0.0314139234573119	not explained by microglial abundance
+microglia	up_consensus	True	0.0021043329928084	0.14097907309689	not explained by microglial abundance

@@ -4,16 +4,16 @@ Analysis code for:
 
 > Guo K, Wang Z. *Prespecified cross-cohort testing localises an astrocyte-compartment ALS signature to a multicellular myeloid–glial response in the spinal ventral horn.* Manuscript submitted to *Molecular Neurodegeneration*.
 
-The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with twelve amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
+The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with thirteen amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
 
 ## Contents
 
 | Path | Contents |
 |---|---|
 | `scripts/` | All analysis scripts, Python and R (see the pipeline below) |
-| `scripts/figures_v2/` | R panel scripts (ggplot2 + patchwork); `compose_figures_v3.R` assembles the submitted main Figures 1-5 and Supplementary Figures S1-S8 |
-| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-12, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
-| `docs/analyses/` | One README per analysis (W32-W69): design, results and reading |
+| `scripts/figures_v2/` | R panel scripts (ggplot2 + patchwork); `compose_figures_v3.R` assembles the submitted main Figures 1-5 and Supplementary Figures S1-S9 |
+| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-13, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
+| `docs/analyses/` | One README per analysis (W32-W70): design, results and reading |
 | `docs/supplementary_tables/` | Supplementary Tables S1-S4 (TSV), as submitted |
 | `metadata/` | Small sample manifests derived from public metadata and read by the scripts |
 
@@ -87,7 +87,8 @@ Run the scripts from the repository root in this order. Each `results/<analysis>
 | **12b. Spatial sensitivity and motor selectivity** (Amendment 10) | `run_w66_post_hoc_sensitivity.py` (review-prompted); `build_w67_annotation_pseudobulk.py` → `run_w67_motor_selectivity.R` | W66 post hoc, W67 |
 | **12c. Independent spatial replication** (Amendment 11) | `extract_w68_gse288365_metadata.R` → `build_w68_gse288365_pseudobulk.R` → `run_w68_replication.R`, `run_w68_protein_colocalisation.R` | W68 |
 | **12d. Dose-response and cross-cohort combination** (Amendment 12) | `run_w69_dose_response_and_combination.R` | W69 |
-| **13. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig7_motor_territory.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`, `figS4_spatial.R`, `figS5_motor_selectivity.R`, `figS6_dose_response.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
+| **12e. Microglia-adjusted territory test** (Amendment 13) | `run_w70_microglia_adjusted_territory.R` (uses the W67 and W68 territory inputs) | W70 |
+| **13. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig7_motor_territory.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`, `figS4_spatial.R`, `figS5_motor_selectivity.R`, `figS6_dose_response.R`, `figS9_microglia_adjusted.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
 
 Several scripts check themselves against earlier outputs and stop on mismatch. For example, W60 and W61 reproduce the W58 pools, W62 reproduces the W34 fold changes, and the W55 clinical and W56 E3a gene-level source data must equal the committed set-level results.
 

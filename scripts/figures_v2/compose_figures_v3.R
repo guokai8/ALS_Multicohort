@@ -119,4 +119,7 @@ compose("FigS6_lumbar_territory", "FigureS6_lumbar_territory",
         (untag(s5$pa) | untag(s5$pb)) + plot_layout(widths = c(2, 1)) + plot_annotation(tag_levels = "a"), 183, 105, "FigS5_motor_selectivity")
 compose("FigS7_dose_response", "FigureS7_dose_response", s6$pa, 140, 100, "FigS6_dose_response")
 compose("FigS8_evidence_map", "FigureS8_evidence_map", f6$fig, 183, 130, "Fig6_evidence_map")
+s9 <- P("FigureS9_microglia_adjusted")
+compose("FigS9_microglia_adjusted", "FigureS9_microglia_adjusted", (s9$pa | s9$pb) + plot_layout(widths = c(1.2, 1)) + plot_annotation(tag_levels = "a"),
+        183, 95, "FigS9_microglia_adjusted")
 cat("Figures_v3 written to", V3, "\n")
