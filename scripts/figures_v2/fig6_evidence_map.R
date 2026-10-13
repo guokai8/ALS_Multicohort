@@ -32,6 +32,8 @@ w67 <- rd("W67_motor_selectivity", "w67_motor_selectivity_tests.tsv")
 w67i <- w67[w67$comparison == "grey_ventral_vs_dorsal_horn" & w67$gene_set == "up" & w67$contrast == "interaction", ]
 w68 <- rd("W68_GSE288365_replication", "w68_replication_tests.tsv")
 w68i <- w68[w68$analysis == "primary" & w68$comparison == "grey" & w68$gene_set == "up" & w68$contrast == "interaction", ]
+w69b <- rd("W69_dose_response_and_combination", "w69b_interaction_combination.tsv")
+w69p <- w69b$stouffer_p_one_sided[w69b$gene_set == "up"]
 
 # ---- column 1: lineage with the highest baseline share of each ALS-up gene (W56 E1, Pineda) ----
 share_cols <- grep("^pineda_share_", names(spec), value = TRUE)
@@ -57,7 +59,7 @@ col2 <- data.frame(
             "Published deconvolution (W64)",
             "Visium spatial, frozen module (W66)",
             "Visium spatial, consensus (W66)",
-            "Motor vs sensory grey (W67, W68)"),
+            "Ventral-horn rise, frozen up (W67-W69)"),
   body = c("Discovery cohort defines candidates only",
            sprintf("Motor cortex P = %s; spinal cord P = %s", fp(w55_up[["motor_cortex"]]), fp(w55_up[["spinal_cord"]])),
            sprintf("Up arm: SC P = %s; MC P = %s\nDown arm: MC P = %s; SC P = %s",
@@ -71,8 +73,8 @@ col2 <- data.frame(
            sprintf("Whole section: SC P = %s; MC P = %s", fp(w66_p[["LSC up"]]), fp(w66_p[["MTC up"]])),
            sprintf("Up arm: SC P = %s; MC P = %s\nStrongest in astrocyte-dominated spots (SC)",
                    fp(w66_p[["LSC up_consensus"]]), fp(w66_p[["MTC up_consensus"]])),
-           sprintf("Frozen up rises in ventral horn\nLumbar: interaction P = %s (BH %s)\nCervical, independent: P = %s (BH %s)",
-                   fp(w67i$fry_p), fp(w67i$fry_BH_primary_family), fp(w68i$fry_p), fp(w68i$fry_BH_primary_family))),
+           sprintf("Lumbar: interaction P = %s (BH %s)\nCervical, independent: P = %s (BH %s)\nCombined (Stouffer) P = %s",
+                   fp(w67i$fry_p), fp(w67i$fry_BH_primary_family), fp(w68i$fry_p), fp(w68i$fry_BH_primary_family), fp(w69p))),
   tier = c("candidate", "confirmed", "confirmed", "model", "model", "not_supported", "exploratory", "exploratory")
 )
 
@@ -124,7 +126,7 @@ write_source(boxes, out, "evidence_map_boxes")
 headers <- data.frame(
   x = col_x0 + COL_W / 2, y = TOP + 6.5,
   title = c("Cell sources", "Reproducible ALS programme", "Pathway context", "Candidate communication axes"),
-  sub = c("Lineage with highest baseline share (W56)", "Prespecified tests (W55-W68)", "Astrocyte-compartment meta-analysis (W63)", "Ligand–receptor pairs (W65)")
+  sub = c("Lineage with highest baseline share (W56)", "Prespecified tests (W55-W69)", "Astrocyte-compartment meta-analysis (W63)", "Ligand–receptor pairs (W65)")
 )
 arrows <- data.frame(x = col_x0[1:3] + COL_W + 0.6, xend = col_x0[2:4] - 0.6, y = (TOP + BOTTOM) / 2 + 3, yend = (TOP + BOTTOM) / 2 + 3)
 

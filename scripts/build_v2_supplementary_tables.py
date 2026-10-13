@@ -3,9 +3,9 @@
 
 S1: frozen analysis plan and amendments, with commit hashes, times and SHA-256.
 S2: registry of every test of the frozen modules and the consensus signature
-    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64, W66-W68).
+    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64, W66-W69).
 S3: deviations from the plan and amendments.
-S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs, W66 spatial, W67 motor-system selectivity, W68 independent spatial replication).
+S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs, W66 spatial, W67 motor-system selectivity, W68 independent spatial replication, W69 dose-response and cross-cohort combination).
 
 All values are read from committed result tables and from git; nothing is re-computed.
 """
@@ -81,6 +81,7 @@ S1_ROWS = [
     ("_AMENDMENT_9", "Amendment 9", "Exploratory spatial context in GSE330224 Visium: donor pseudobulk disease tests, lineage niches, co-localisation, ligand-receptor co-detection", "W66 spatial context (exploratory)", "89c7c6a"),
     ("_AMENDMENT_10", "Amendment 10", "Review-prompted W66 sensitivity (empirical co-detection null, depth-partial co-localisation; already observed) and W67 motor- vs sensory-territory test (fixed before running)", "W66 post hoc; W67 motor-system selectivity (exploratory)", "96335a5"),
     ("_AMENDMENT_11", "Amendment 11", "Replication of motor-territory selectivity in an independent spatial cohort (GSE288365 Visium CytAssist cervical cord), with motor-neuron proximity and protein co-localisation", "W68 independent spatial replication (exploratory)", "7f9c562"),
+    ("_AMENDMENT_12", "Amendment 12", "Dose-response of the motor-territory response with motor-neuron loss (fixed before running) and Stouffer combination of the W67 and W68 territory tests (post hoc summary of known results)", "W69 (exploratory; B post hoc)", "1c819a7"),
 ]
 
 
@@ -402,8 +403,27 @@ def w68() -> pd.DataFrame:
                 effect_type="median logFC")
 
 
+def w69() -> pd.DataFrame:
+    rel_a = "W69_dose_response_and_combination/w69a_dose_response_by_cohort.tsv"
+    a = read(rel_a).rename(columns={"n_als": "n_case", "rho": "effect", "p_one_sided": "other_p"})
+    a["n_control"] = pd.NA
+    a["test_id"] = "dose_response:" + a["cohort"]
+    a["gene_set"] = gene_set_label(a["gene_set"])
+    a = rows(a, rel_a, analysis="W69", phase="Exploratory (Amendment 12 A)", region="motor minus sensory grey",
+             contrast="Within ALS: motor-neuron index vs module response", design="Spearman, within ALS donors",
+             effect_type="Spearman rho (predicted < 0)", other_p_type="one-sided Spearman P")
+    rel_b = "W69_dose_response_and_combination/w69b_interaction_combination.tsv"
+    b = read(rel_b).rename(columns={"stouffer_z": "effect", "stouffer_p_one_sided": "other_p"})
+    b["test_id"] = "stouffer:W67+W68"
+    b["gene_set"] = gene_set_label(b["gene_set"])
+    b = rows(b, rel_b, analysis="W69", phase="Post hoc summary of known results (Amendment 12 B)", cohort="GSE330224 + GSE288365",
+             region="spinal grey matter", contrast="Territory x disease interaction, two cohorts combined",
+             design="unweighted Stouffer of one-sided fry P", effect_type="Stouffer Z", other_p_type="combined one-sided P")
+    return pd.concat([a, b])
+
+
 def build_s2() -> pd.DataFrame:
-    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64(), w66(), w67(), w68()]
+    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64(), w66(), w67(), w68(), w69()]
     return pd.concat([p.astype(object) for p in parts], ignore_index=True)
 
 
@@ -469,6 +489,10 @@ S3_ROWS = [
     ("W66 co-localisation depth sensitivity (not in Amendment 9)", "Spearman correlation across spots",
      "Also with ranks residualised on log spot depth", "Post hoc, review-prompted; observed before Amendment 10", "W66",
      "results/W66_spatial_context/post_hoc/README.md"),
+    ("W69 B cross-cohort combination", "Not planned",
+     "Unweighted Stouffer combination of the W67 and W68 one-sided territory-interaction P values",
+     "Post hoc summary; both inputs were known when Amendment 12 was written; reported as a summary, not a new test", "W69",
+     "results/W69_dose_response_and_combination/README.md"),
     ("Pre-plan W50 (M1 controls)", "BA4 plus M1 controls sensitivity", "Dropped",
      "The five M1 control samples are C57BL/6 mouse tissue", "W50", "results/W50_Pineda_final15_validation/README.md"),
 ]
@@ -492,14 +516,15 @@ def build_s4() -> dict[str, pd.DataFrame]:
                 read("W66_spatial_context/post_hoc/w66_lr_codetection_empirical_null.tsv").drop(columns="observed"), on=["tissue", "pair"]),
             "S4h_W67_territory_genes": read("W67_motor_selectivity/w67_module_gene_results.tsv"),
             "S4i_W68_territory_genes": read("W68_GSE288365_replication/w68_module_gene_results.tsv"),
-            "S4j_W68_protein_coloc": read("W68_GSE288365_replication/w68_protein_colocalisation_summary.tsv")}
+            "S4j_W68_protein_coloc": read("W68_GSE288365_replication/w68_protein_colocalisation_summary.tsv"),
+            "S4k_W69_dose_response_donors": read("W69_dose_response_and_combination/w69a_donor_values.tsv")}
 
 
 README_ROWS = [
-    ("Supplementary Table S1", "Frozen analysis plan and eleven amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
-    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64, W66-W68). phase gives the status of each test; null and post hoc results are included."),
+    ("Supplementary Table S1", "Frozen analysis plan and twelve amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
+    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64, W66-W69). phase gives the status of each test; null and post hoc results are included."),
     ("Supplementary Table S3", "Deviations from the frozen plan and amendments, with reasons and timing."),
-    ("Supplementary Table S4", "Exploratory biological context (Amendments 8-11): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values); S4e-S4g GSE330224 Visium region share, spot co-localisation and ligand-receptor co-detection with its matched-random-pair null (W66, Amendments 9 and 10); S4h gene-level ALS effects in motor and sensory spinal-cord territories (W67, Amendment 10); S4i the same in the independent GSE288365 cohort and S4j spot-level protein co-localisation there (W68, Amendment 11)."),
+    ("Supplementary Table S4", "Exploratory biological context (Amendments 8-12): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values); S4e-S4g GSE330224 Visium region share, spot co-localisation and ligand-receptor co-detection with its matched-random-pair null (W66, Amendments 9 and 10); S4h gene-level ALS effects in motor and sensory spinal-cord territories (W67, Amendment 10); S4i the same in the independent GSE288365 cohort and S4j spot-level protein co-localisation there (W68, Amendment 11); S4k donor-level motor-neuron index and module response (W69, Amendment 12)."),
     ("Repository", f"Generated by scripts/build_v2_supplementary_tables.py at commit {git('rev-parse', '--short', 'HEAD')}."),
 ]
 
