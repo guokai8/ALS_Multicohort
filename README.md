@@ -4,16 +4,16 @@ Analysis code for:
 
 > Guo K, Wang Z. *Cross-cohort donor-level analysis reveals a reproducible multicellular glial–vascular ALS transcriptional programme detected in astrocyte compartments.* Manuscript submitted to *Molecular Neurodegeneration*.
 
-The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with ten amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
+The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with eleven amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
 
 ## Contents
 
 | Path | Contents |
 |---|---|
 | `scripts/` | All analysis scripts, Python and R (see the pipeline below) |
-| `scripts/figures_v2/` | R scripts for main Figures 1-6 and Supplementary Figures S1-S5 (ggplot2 + patchwork) |
-| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-10, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
-| `docs/analyses/` | One README per analysis (W32-W67): design, results and reading |
+| `scripts/figures_v2/` | R scripts for main Figures 1-7 and Supplementary Figures S1-S5 (ggplot2 + patchwork) |
+| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-11, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
+| `docs/analyses/` | One README per analysis (W32-W68): design, results and reading |
 | `docs/supplementary_tables/` | Supplementary Tables S1-S4 (TSV), as submitted |
 | `metadata/` | Small sample manifests derived from public metadata and read by the scripts |
 
@@ -21,7 +21,7 @@ This repository contains **no data**. All inputs are public (see [Data sources](
 
 ## Requirements
 
-- **R** 4.5 with edgeR, limma, metafor, survival, readxl, fgsea, msigdbr, liana, ggplot2, patchwork, svglite, ragg and ggrepel (`environment/R_packages.tsv`).
+- **R** 4.5 with edgeR, limma, metafor, survival, readxl, fgsea, msigdbr, liana, SeuratObject, Matrix, ggplot2, patchwork, svglite, ragg and ggrepel (`environment/R_packages.tsv`).
 - **Python** 3.10 or later with pandas, numpy, scipy, statsmodels, anndata, h5py and openpyxl (`environment/requirements.txt`).
 - Running everything takes a few hours on a laptop. The longest single step is `run_w58_multicohort_meta.R` (about 12 min).
 
@@ -46,6 +46,7 @@ Other_Datasets/Pineda_snRNAseq/synapse_download/Processed Data/   Synapse syn511
 Other_Datasets/Multiome_Dataset/files/                            Zenodo 10.5281/zenodo.18370646 (Ulm/DZNE)
 Other_Datasets/Masrori2025_NatNeuro/files/                        41593_2025_2075_MOESM2_ESM.xlsx (Masrori et al. supplement)
 GSE330224/                       GSE330224_{LSC,MTC}_VISIUM_COUNTS.h5ad (Visium spatial)
+GSE288365/seurat/                GSE288365_*_SeuratObject.rds.gz (Visium CytAssist, cervical cord)
 Other_Datasets/NYGC_ALS_Consortium/files/                         count_data_NYGC_ALS_Consortium.csv.gz, NYGC_Flagship_ST_1_3_Metadata.xlsx and NYGC_Flagship_ST_4_16_expression.xlsx
 ```
 
@@ -60,6 +61,7 @@ Other_Datasets/NYGC_ALS_Consortium/files/                         count_data_NYG
 | Zelic et al. 2025, cervical spinal cord | External snRNA-seq | NCBI GEO [GSE287257](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE287257) |
 | Masrori et al. 2025 | Direction only | Supplementary tables of the paper |
 | NYGC GSE330224 Visium, lumbar spinal cord and motor cortex | Exploratory spatial context | NCBI GEO [GSE330224](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE330224) |
+| GSE288365 Visium CytAssist, cervical spinal cord (Zhang et al. 2026) | Independent spatial replication | NCBI GEO [GSE288365](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE288365); donor map from the article's Supplementary Table 1 |
 | NYGC ALS Consortium bulk RNA-seq | Confirmatory hold-out | Counts: Zenodo [10.5281/zenodo.18989237](https://doi.org/10.5281/zenodo.18989237); metadata and published results (ST1, ST3, ST4, ST5, ST7): Zenodo [10.5281/zenodo.20090702](https://doi.org/10.5281/zenodo.20090702); raw reads: NCBI SRA via GEO [GSE137810](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE137810) |
 
 ## Pipeline
@@ -83,7 +85,8 @@ Run the scripts from the repository root in this order. Each `results/<analysis>
 | **11. Biological context** (exploratory, Amendment 8) | `run_w63_pathway_context.R`, `run_w64_bulk_published_composition.R` (sources `run_w55_nygc_bulk_holdout.R`), `run_w65_ligand_receptor_context.R` (uses the W56 lineage pseudobulk) | W63-W65 |
 | **12. Spatial context** (exploratory, Amendment 9) | `build_w66_visium_pseudobulk.py` → `run_w66_spatial_disease_tests.R`, `run_w66_spatial_colocalisation.py` | W66 |
 | **12b. Spatial sensitivity and motor selectivity** (Amendment 10) | `run_w66_post_hoc_sensitivity.py` (review-prompted); `build_w67_annotation_pseudobulk.py` → `run_w67_motor_selectivity.R` | W66 post hoc, W67 |
-| **13. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig6_evidence_map.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`, `figS4_spatial.R`, `figS5_motor_selectivity.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
+| **12c. Independent spatial replication** (Amendment 11) | `extract_w68_gse288365_metadata.R` → `build_w68_gse288365_pseudobulk.R` → `run_w68_replication.R`, `run_w68_protein_colocalisation.R` | W68 |
+| **13. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig7_motor_territory.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`, `figS4_spatial.R`, `figS5_motor_selectivity.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
 
 Several scripts check themselves against earlier outputs and stop on mismatch. For example, W60 and W61 reproduce the W58 pools, W62 reproduces the W34 fold changes, and the W55 clinical and W56 E3a gene-level source data must equal the committed set-level results.
 

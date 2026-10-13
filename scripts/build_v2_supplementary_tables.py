@@ -3,9 +3,9 @@
 
 S1: frozen analysis plan and amendments, with commit hashes, times and SHA-256.
 S2: registry of every test of the frozen modules and the consensus signature
-    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64, W66, W67).
+    (W08 superseded module, pre-plan checks W50-W54, governed analyses W55-W62, W64, W66-W68).
 S3: deviations from the plan and amendments.
-S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs, W66 spatial, W67 motor-system selectivity).
+S4: exploratory biological context (W63 pathways, W64 overlap with NYGC DE, W65 ligand-receptor pairs, W66 spatial, W67 motor-system selectivity, W68 independent spatial replication).
 
 All values are read from committed result tables and from git; nothing is re-computed.
 """
@@ -80,6 +80,7 @@ S1_ROWS = [
     ("_AMENDMENT_8", "Amendment 8", "Exploratory biological context: themed pathway GSEA, bulk hold-out against published deconvolution, ligand-receptor context", "W63 pathways; W64 published composition; W65 ligand-receptor (exploratory)", "73864d2"),
     ("_AMENDMENT_9", "Amendment 9", "Exploratory spatial context in GSE330224 Visium: donor pseudobulk disease tests, lineage niches, co-localisation, ligand-receptor co-detection", "W66 spatial context (exploratory)", "89c7c6a"),
     ("_AMENDMENT_10", "Amendment 10", "Review-prompted W66 sensitivity (empirical co-detection null, depth-partial co-localisation; already observed) and W67 motor- vs sensory-territory test (fixed before running)", "W66 post hoc; W67 motor-system selectivity (exploratory)", "96335a5"),
+    ("_AMENDMENT_11", "Amendment 11", "Replication of motor-territory selectivity in an independent spatial cohort (GSE288365 Visium CytAssist cervical cord), with motor-neuron proximity and protein co-localisation", "W68 independent spatial replication (exploratory)", "7f9c562"),
 ]
 
 
@@ -387,8 +388,22 @@ def w67() -> pd.DataFrame:
     return rows(d, rel, analysis="W67", contrast="ALS vs control (territory interaction)", effect_type="median logFC")
 
 
+def w68() -> pd.DataFrame:
+    rel = "W68_GSE288365_replication/w68_replication_tests.tsv"
+    d = read(rel).rename(columns={"n_als": "n_case", "median_logFC": "effect", "fry_BH_primary_family": "fdr"})
+    d["test_id"] = d["analysis"] + ":" + d["comparison"] + ":" + d["contrast"]
+    d["region"] = d["comparison"]
+    d["phase"] = d["analysis"].map(lambda a: "Exploratory replication (Amendment 11, primary)" if a == "primary"
+                                   else "Exploratory replication (Amendment 11, " + a + ")")
+    d["design"] = "~ territory * disease, donor-blocked; contrast " + d["contrast"] + d["analysis"].map(lambda a: " + sex + age" if a == "sens_sex_age" else "")
+    d["gene_set"] = gene_set_label(d["gene_set"])
+    d["fdr_family"] = d["fdr"].map(lambda x: "" if pd.isna(x) else "fry BH over 4 interaction tests")
+    return rows(d, rel, analysis="W68", cohort="GSE288365 Visium CytAssist cervical cord", contrast="ALS vs control (territory interaction)",
+                effect_type="median logFC")
+
+
 def build_s2() -> pd.DataFrame:
-    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64(), w66(), w67()]
+    parts = [w08(), w50(), w51(), w52(), w53(), w54(), w55(), w56(), w57(), w58(), w59(), w60(), w61(), w62(), w64(), w66(), w67(), w68()]
     return pd.concat([p.astype(object) for p in parts], ignore_index=True)
 
 
@@ -475,14 +490,16 @@ def build_s4() -> dict[str, pd.DataFrame]:
             "S4f_W66_colocalisation": read("W66_spatial_context/w66_colocalisation_summary.tsv"),
             "S4g_W66_lr_codetection": read("W66_spatial_context/w66_lr_codetection_summary.tsv").merge(
                 read("W66_spatial_context/post_hoc/w66_lr_codetection_empirical_null.tsv").drop(columns="observed"), on=["tissue", "pair"]),
-            "S4h_W67_territory_genes": read("W67_motor_selectivity/w67_module_gene_results.tsv")}
+            "S4h_W67_territory_genes": read("W67_motor_selectivity/w67_module_gene_results.tsv"),
+            "S4i_W68_territory_genes": read("W68_GSE288365_replication/w68_module_gene_results.tsv"),
+            "S4j_W68_protein_coloc": read("W68_GSE288365_replication/w68_protein_colocalisation_summary.tsv")}
 
 
 README_ROWS = [
-    ("Supplementary Table S1", "Frozen analysis plan and ten amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
-    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64, W66, W67). phase gives the status of each test; null and post hoc results are included."),
+    ("Supplementary Table S1", "Frozen analysis plan and eleven amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
+    ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64, W66-W68). phase gives the status of each test; null and post hoc results are included."),
     ("Supplementary Table S3", "Deviations from the frozen plan and amendments, with reasons and timing."),
-    ("Supplementary Table S4", "Exploratory biological context (Amendments 8-10): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values); S4e-S4g GSE330224 Visium region share, spot co-localisation and ligand-receptor co-detection with its matched-random-pair null (W66, Amendments 9 and 10); S4h gene-level ALS effects in motor and sensory spinal-cord territories (W67, Amendment 10)."),
+    ("Supplementary Table S4", "Exploratory biological context (Amendments 8-11): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values); S4e-S4g GSE330224 Visium region share, spot co-localisation and ligand-receptor co-detection with its matched-random-pair null (W66, Amendments 9 and 10); S4h gene-level ALS effects in motor and sensory spinal-cord territories (W67, Amendment 10); S4i the same in the independent GSE288365 cohort and S4j spot-level protein co-localisation there (W68, Amendment 11)."),
     ("Repository", f"Generated by scripts/build_v2_supplementary_tables.py at commit {git('rev-parse', '--short', 'HEAD')}."),
 ]
 

@@ -8,7 +8,7 @@ authors:
     given-names: Zhihan
 repository-code: "https://github.com/guokai8/ALS_Multicohort"
 license: MIT
-version: 1.4.0
+version: 1.5.0
 date-released: 2026-10-12
 keywords:
   - ALS

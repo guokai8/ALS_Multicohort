@@ -11,7 +11,7 @@ boxes <- data.frame(
   y = c(6, 5, 4, 3, 2, 3, 1, 2),
   label = c("Discovery: GSE330130 motor cortex\nastrocyte-compartment pseudobulk (11 ALS / 7 ctrl)",
             "Frozen modules: 15 ALS-up / 14 ALS-down genes",
-            "Frozen analysis plan v1.0 + Amendments 1-10\n(committed before each governed analysis)",
+            "Frozen analysis plan v1.0 + Amendments 1-11\n(committed before each governed analysis)",
             "Independent snRNA-seq:\n5 contrasts from 4 studies",
             "Meta-analysis +\n159-gene consensus signature",
             "NYGC bulk hold-out:\nfrozen modules (test 1)",
@@ -43,7 +43,7 @@ pa <- ggplot() +
 log_lines <- system2("git", c("-C", shQuote(FIG_ROOT), "log", "--reverse", shQuote("--format=%h|%ad|%s"), shQuote("--date=format:%Y-%m-%d %H:%M"), "841cd1a..HEAD"), stdout = TRUE)
 log <- do.call(rbind, lapply(strsplit(log_lines, "\\|"), function(x) data.frame(hash = x[1], time = x[2], subject = x[3])))
 events <- data.frame(
-  hash = c("267949d", "b7266f0", "02f1136", "2861aef", "dfa6954", "9b1fd37", "bbd5e98", "8ce592d", "4624cc1", "957a06a", "5605120", "fedddd5", "896ce41", "7f16fd3", "284d22c", "9342a49", "b6b8c94", "73864d2", "0576362", "89c7c6a", "ed60da9", "96335a5"),
+  hash = c("267949d", "b7266f0", "02f1136", "2861aef", "dfa6954", "9b1fd37", "bbd5e98", "8ce592d", "4624cc1", "957a06a", "5605120", "fedddd5", "896ce41", "7f16fd3", "284d22c", "9342a49", "b6b8c94", "73864d2", "0576362", "89c7c6a", "ed60da9", "96335a5", "c5af36b", "7f9c562"),
   label = c("W50-W54 external checks (observed before plan)", "Plan v1.0 frozen", "Amendment 1 (hold-out implementation)",
             "W55 bulk hold-out: frozen modules", "Amendment 2 (cell source)", "W56 cell-source checks",
             "Amendment 3 (ambient RNA)", "W57 ambient-RNA test", "Amendment 4 (meta-analysis)", "W58 meta-analysis",
@@ -52,8 +52,9 @@ events <- data.frame(
             "Amendment 7 (review-prompted checks)", "W61 HKSJ inference; W62 discovery audit",
             "Amendment 8 (exploratory biological context)", "W63-W65 pathways, composition, ligand-receptor",
             "Amendment 9 (spatial context)", "W66 Visium spatial context",
-            "Amendment 10 (W66 sensitivity; motor selectivity)", "W66 post hoc; W67 motor vs sensory territory"),
-  kind = c("prior", "plan", "plan", "confirmatory", "plan", "exploratory", "plan", "exploratory", "plan", "consolidation", "plan", "confirmatory", "plan", "consolidation", "plan", "consolidation", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory")
+            "Amendment 10 (W66 sensitivity; motor selectivity)", "W66 post hoc; W67 motor vs sensory territory",
+            "Amendment 11 (independent spatial replication)", "W68 GSE288365 replication"),
+  kind = c("prior", "plan", "plan", "confirmatory", "plan", "exploratory", "plan", "exploratory", "plan", "consolidation", "plan", "confirmatory", "plan", "consolidation", "plan", "consolidation", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory", "plan", "exploratory")
 )
 log$commit_index <- seq_len(nrow(log))
 events <- merge(events, log, by = "hash")
@@ -90,6 +91,9 @@ ba4 <- pin[pin$Region == "BA4" & pin$prefix %in% c("191112", "191114") & pin$Con
 ba9 <- pin[pin$Region == "BA9" & pin$prefix == "210526" & pin$Condition %in% c("ALS", "PN") & pin$lib_size > 0 & !is.na(pin$age), ]
 nygc <- read.delim(file.path(RES, "W55_NYGC_bulk_holdout", "w55_primary_module_tests.tsv"))
 nygc <- nygc[nygc$module == "up", ]
+w68u <- read.delim(file.path(RES, "W68_GSE288365_replication", "inputs", "w68_units.tsv"))
+w68u <- w68u[w68u$unit_type == "territory" & w68u$stratum == "anterior_horn" & !w68u$donor %in% c("NEUVM032BF2", "NEUWD570BTK"), ]
+w68_counts <- c(als = sum(w68u$diagnosis != "Control"), ctrl = sum(w68u$diagnosis == "Control"))
 visium <- lapply(c(LSC = "LSC", MTC = "MTC"), function(t) {
   u <- read.delim(file.path(RES, "W66_spatial_context", "inputs", paste0(t, "_units.tsv")))
   u <- u[u$unit_type == "whole" & u$group %in% c("ALS", "Control") & !(u$gse330130_donor %in% c(TRUE, "True")), ]
@@ -105,18 +109,18 @@ counts <- rbind(
   c(als = 5, ctrl = 5),
   c(als = nygc$n_als_donors[nygc$region == "motor_cortex"], ctrl = nygc$n_control_donors[nygc$region == "motor_cortex"]),
   c(als = nygc$n_als_donors[nygc$region == "spinal_cord"], ctrl = nygc$n_control_donors[nygc$region == "spinal_cord"]),
-  visium$LSC, visium$MTC
+  visium$LSC, visium$MTC, w68_counts
 )
 cohorts <- data.frame(
   cohort = c("NYGC GSE330130 (discovery)", "Zelic 2025", "Li 2023", "Ulm/DZNE (Ruf 2026)", "Pineda 2024 BA4 (2019 campaign)",
-             "Pineda 2024 BA9 (batch 210526)", "Masrori 2025", "NYGC bulk hold-out", "NYGC bulk hold-out", "GSE330224 Visium", "GSE330224 Visium"),
+             "Pineda 2024 BA9 (batch 210526)", "Masrori 2025", "NYGC bulk hold-out", "NYGC bulk hold-out", "GSE330224 Visium", "GSE330224 Visium", "GSE288365 Visium CytAssist"),
   region = c("Motor cortex", "Cervical spinal cord", "Motor cortex (C9)", "Motor cortex", "Motor cortex", "Prefrontal cortex",
-             "Motor cortex + spinal cord", "Motor cortex", "Spinal cord", "Lumbar spinal cord", "Motor cortex"),
+             "Motor cortex + spinal cord", "Motor cortex", "Spinal cord", "Lumbar spinal cord", "Motor cortex", "Cervical spinal cord"),
   astrocytes = c("Author labels", "Marker rule", "Marker rule", "Author WNN labels", "Author labels", "Author labels",
-                 "Author labels (summary DE)", "Bulk tissue", "Bulk tissue", "Spatial spots", "Spatial spots"),
+                 "Author labels (summary DE)", "Bulk tissue", "Bulk tissue", "Spatial spots", "Spatial spots", "Spatial spots + protein"),
   role = c("Discovery", "Independent snRNA", "Independent snRNA", "Independent snRNA", "Independent snRNA",
            "Independent snRNA (shares donors with BA4)", "Direction only", "Confirmatory hold-out", "Confirmatory hold-out",
-           "Exploratory spatial", "Exploratory spatial"),
+           "Exploratory spatial", "Exploratory spatial", "Exploratory spatial replication"),
   als = counts[, "als"], ctrl = counts[, "ctrl"]
 )
 cohorts$donors <- paste0(cohorts$als, " / ", cohorts$ctrl)

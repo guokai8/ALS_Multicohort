@@ -13,3 +13,5 @@ ggrepel	0.9.8
 fgsea	1.36.2
 msigdbr	26.1.0
 liana	0.1.14
+SeuratObject	5.3.0
+Matrix	1.7.5
