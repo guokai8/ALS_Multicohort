@@ -4,7 +4,7 @@ Analysis code for:
 
 > Guo K, Wang Z. *Cross-platform validation of an ALS glial transcriptomic signature reveals a ventral-horn myeloid–glial response.* Manuscript submitted to *Molecular Neurodegeneration*.
 
-The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with fifteen amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
+The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with sixteen amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
 
 ## Contents
 
@@ -12,8 +12,8 @@ The study uses a donor-level discovery cohort (GSE330130) only to define candida
 |---|---|
 | `scripts/` | All analysis scripts, Python and R (see the pipeline below) |
 | `scripts/figures_v2/` | R panel scripts (ggplot2 + patchwork); `compose_figures_v3.R` assembles the submitted main Figures 1-5 and Supplementary Figures S1-S10 |
-| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-15, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
-| `docs/analyses/` | One README per analysis (W32-W73): design, results and reading |
+| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-16, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
+| `docs/analyses/` | One README per analysis (W32-W74): design, results and reading |
 | `docs/supplementary_tables/` | Supplementary Tables S1-S4 (TSV), as submitted |
 | `metadata/` | Small sample manifests derived from public metadata and read by the scripts |
 
@@ -79,7 +79,7 @@ Run the scripts from the repository root in this order. Each `results/<analysis>
 | **4. Li** | `build_w54_li2023_astrocyte_pseudobulk.py` (uses `w54_marker_annotation.py`) → `run_w54_li2023_motor_cortex_validation.R` → `run_w54_post_hoc_depth.R` | W54 |
 | **5. Masrori** | `run_w53_masrori_astrocyte_lookup.py` | W53 |
 | **6. NYGC bulk hold-out** (confirmatory test 1) | `build_w55_nygc_holdout_inputs.py` → `run_w55_nygc_bulk_holdout.R` → `run_w55_clinical_source_data.R` | W55 |
-| **7. Cell source and ambient RNA** | `build_w56_lineage_pseudobulk.py` → `run_w56_e1_celltype_specificity.py`, `run_w56_e2_celltype_disease_shift.R`, `run_w56_e3_nygc_composition_retest.R`; `build_w57_ambient_inputs.py` → `run_w57_ambient_contamination_test.R`; `run_w56_e3_gene_source_data.R` (gene-level E3a results for Supplementary Fig. S3) | W56, W57 |
+| **7. Cell source and ambient RNA** | `build_w56_lineage_pseudobulk.py` → `run_w56_e1_celltype_specificity.py`, `run_w56_e2_celltype_disease_shift.R`, `run_w56_e3_nygc_composition_retest.R`; `build_w57_ambient_inputs.py` → `run_w57_ambient_contamination_test.R`; `run_w56_e3_gene_source_data.R` (gene-level E3a results for Fig. 2b) | W56, W57 |
 | **8. Meta-analysis and consensus** | `build_w58_zelic_astrocyte_pseudobulk.py` → `run_w58_multicohort_meta.R` (uses `w58_cohort_fits.R`) | W58 |
 | **9. Consensus hold-out** (confirmatory test 2) | `run_w59_nygc_consensus_signature_holdout.R` | W59 |
 | **10. Sensitivity and review checks** | `run_w60_age70_sensitivity.R`, `run_w61_small_k_meta_inference.R`, `run_w62_discovery_confounder_audit.R` | W60-W62 |
@@ -91,6 +91,7 @@ Run the scripts from the repository root in this order. Each `results/<analysis>
 | **12e. Microglia-adjusted territory test** (Amendment 13) | `run_w70_microglia_adjusted_territory.R` (uses the W67 and W68 territory inputs) | W70 |
 | **12f. Mouse time course and disease-state cell source** (Amendment 14) | `build_w71_maniatis_pseudobulk.py` → `run_w71_mouse_time_course.R`, `run_w71_human_colocalisation.py`; `run_w72_zelic_disease_cell_source.py` → `run_w72_lineage_de.R` | W71, W72 |
 | **12g. Generic inflammation, microglial and ageing signatures** (Amendment 15) | `run_w73_generic_signature_comparison.R` (uses the W67 and W68 territory inputs) | W73 |
+| **12h. Within-lineage source test** (Amendment 16; mixed result, not used in the manuscript conclusions) | `run_w74_within_lineage_source.R` (uses the W01 lineage pseudobulk, the W33 diagnosis bridge, and the W56 and W72 lineage pseudobulk) | W74 |
 | **13. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig7_motor_territory.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`, `figS4_spatial.R`, `figS5_motor_selectivity.R`, `figS6_dose_response.R`, `figS9_microglia_adjusted.R`, `figS10_mouse_cell_source.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
 
 Several scripts check themselves against earlier outputs and stop on mismatch. For example, W60 and W61 reproduce the W58 pools, W62 reproduces the W34 fold changes, and the W55 clinical and W56 E3a gene-level source data must equal the committed set-level results.

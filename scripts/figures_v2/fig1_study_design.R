@@ -12,8 +12,8 @@ boxes <- data.frame(
   label = c("Discovery: GSE330130 motor cortex\nastrocyte-compartment pseudobulk (11 ALS / 7 ctrl)",
             "Frozen modules: 15 ALS-up / 14 ALS-down genes",
             "Time-stamped analysis plan\n(updates committed before each analysis)",
-            "Bulk replication (NYGC hold-out, no discovery donors):\nfrozen modules and consensus signature",
-            "Independent snRNA-seq: 5 contrasts\n(consensus signature; cohort-design audit)",
+            "Bulk replication (NYGC hold-out,\nno discovery donors): frozen modules",
+            "Independent snRNA-seq: 5 contrasts\n(cohort-design audit)",
             "Spatial localisation: motor vs sensory\nterritory in lumbar and cervical cord",
             "Cell source: lineage expression,\nspot and protein co-localisation"),
   role = c("discovery", "discovery", "plan", "confirmatory", "consolidation", "exploratory", "exploratory")

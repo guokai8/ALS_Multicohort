@@ -12,8 +12,14 @@ tag <- function(p, t) p + labs(tag = t)
 compose <- function(dirname, fname, fig, width, height, sources) {
   d <- file.path(V3, dirname)
   dir.create(file.path(d, "source_data"), recursive = TRUE, showWarnings = FALSE)
-  for (src in sources) for (f in list.files(file.path(FIG_OUT, src, "source_data"), full.names = TRUE))
-    file.copy(f, file.path(d, "source_data", paste0(src, "__", basename(f))), overwrite = TRUE)
+  unlink(list.files(file.path(d, "source_data"), pattern = "__", full.names = TRUE))  # copied files only
+  # a source is "<panel dir>" or "<panel dir>:<regex on file name>" when only some panels are used
+  for (src in sources) {
+    parts <- strsplit(src, ":", fixed = TRUE)[[1]]
+    files <- list.files(file.path(FIG_OUT, parts[1], "source_data"), full.names = TRUE)
+    if (length(parts) > 1) files <- files[grepl(parts[2], basename(files))]
+    for (f in files) file.copy(f, file.path(d, "source_data", paste0(parts[1], "__", basename(f))), overwrite = TRUE)
+  }
   save_pub_r(fig, d, fname, width_mm = width, height_mm = height)
 }
 
@@ -32,12 +38,12 @@ mid <- (tag(untag(f3$pc1), "d") | untag(f3$pc2) | tag(untag(f3$pd1), "e") | unta
 bot <- tag(untag(f4$pa), "f")
 compose("Fig5_single_nucleus_replication", "Figure5_single_nucleus_replication",
         wrap_elements(full = top) / wrap_elements(full = mid) / wrap_elements(full = bot) + plot_layout(heights = c(1.15, 0.9, 1.35)),
-        183, 215, c("Fig3_confounding", "Fig4_meta"))
+        183, 215, c("Fig3_cohort_confounding", "Fig4_meta_analysis:panel_a"))
 
 # ---- Fig. 3: confirmation in an independent bulk hold-out ----
 compose("Fig2_bulk_holdout", "Figure2_bulk_holdout",
-        (tag(untag(f5$pa), "a") | tag(untag(f4$pb), "b") | tag(untag(f5$pb), "c")) + plot_layout(widths = c(1, 1.15, 1)),
-        183, 85, c("Fig5_nygc_holdout", "Fig4_meta"))
+        (tag(untag(f5$pa), "a") | tag(untag(s3$pa), "b")) + plot_layout(widths = c(0.75, 1.6)),
+        183, 120, c("Fig5_NYGC_bulk_holdout:panel_a", "FigS3_holdout_genes"))
 
 # ---- Fig. 4: the signal is multicellular, not astrocyte-specific ----
 spec <- read.delim(file.path(RES, "W56_cell_source_check", "w56_e1_module_gene_specificity.tsv"), check.names = FALSE)
@@ -75,7 +81,7 @@ write.table(co, file.path(d4, "panel_b_colocalisation_depth_partial.tsv"), sep =
 # ---- Fig. 4: ventral-horn response in two spatial cohorts ----
 compose("Fig3_ventral_horn", "Figure3_ventral_horn",
         (tag(untag(f7$pa), "a") | tag(untag(f7$pb), "b")) + plot_layout(widths = c(1.3, 1)),
-        150, 95, "Fig7_motor_territory")
+        150, 80, "Fig7_motor_territory:panel_a|panel_b")
 
 # ---- Fig. 5: cell source, with a summary schematic (d) ----
 stage <- data.frame(xmin = c(0.2, 5.4, 10.6), xmax = c(4.6, 9.8, 17.8), ymin = 1.15, ymax = 5.6,
@@ -108,7 +114,7 @@ pm <- ggplot() +
   theme_void(base_family = "Arial") + theme(plot.title = element_text(size = 6.4, face = "bold"), plot.tag = element_text(size = 8, face = "bold"))
 compose("Fig4_cell_source", "Figure4_cell_source",
         (p4a | (p4b / tag(untag(f7$pc), "c") + plot_layout(heights = c(1, 1)))) / pm + plot_layout(heights = c(1.75, 0.62)),
-        183, 165, "Fig7_motor_territory")
+        183, 165, "Fig7_motor_territory:panel_c")
 
 # ---- Supplementary figures ----
 compose("FigS1_discovery_audit", "FigureS1_discovery_audit",
@@ -119,9 +125,11 @@ compose("FigS2_contamination", "FigureS2_contamination", (untag(f2$pa) | untag(f
 compose("FigS8_cell_source", "FigureS8_cell_source",
         (s2$pa | (s2$pb / s2$pc + plot_layout(heights = c(1, 1.15)))) + plot_layout(widths = c(0.9, 1.1)) + plot_annotation(tag_levels = "a"),
         183, 150, "FigS2_cell_source")
-compose("FigS3_holdout_genes_clinical", "FigureS3_holdout_genes_clinical",
-        untag(s3$pa) / (untag(f5$pc1) | untag(f5$pc2)) + plot_layout(heights = c(1.5, 1)) + plot_annotation(tag_levels = list(c("a", "b", ""))),
-        183, 190, c("FigS3_holdout_genes", "Fig5_nygc_holdout"))
+# Consensus signature (moved from main Fig. 2) and clinical association
+compose("FigS3_consensus_clinical", "FigureS3_consensus_clinical",
+        ((tag(untag(f4$pb), "a") | tag(untag(f5$pb), "b")) + plot_layout(widths = c(1.15, 1))) /
+          ((tag(untag(f5$pc1), "c") | untag(f5$pc2)) + plot_layout(widths = c(1, 1))) + plot_layout(heights = c(1, 1)),
+        183, 160, c("Fig4_meta_analysis:panel_b", "Fig5_NYGC_bulk_holdout:panel_b|panel_c"))
 compose("FigS4_spatial_lumbar_cortex", "FigureS4_spatial_lumbar_cortex",
         (untag(s4$pa) | untag(s4$pb)) / (untag(s4$pc) | untag(s4$pd)) + plot_layout(heights = c(1.15, 1)) + plot_annotation(tag_levels = "a"),
         183, 190, "FigS4_spatial")
