@@ -80,9 +80,9 @@ model_boxes <- data.frame(
   x = c(2, 1.05, 2.95, 1.05, 2),
   y = c(4.3, 2.95, 2.95, 1.6, 0.35),
   lab = c("ALS: lower motor neuron\nloss in the ventral horn",
-          "Focal ventral-horn\nresponse (frozen module):\nGPNMB, ANXA1, LTF,\nEMP3, C3",
-          "Broader astrocyte-\ncompartment remodelling\n(consensus signature)",
-          "Tracks CD68+ HLA-DR+\nmyeloid cells; baseline\nmicroglial and vascular-\nmeningeal expression",
+          "Focal ventral-horn\nresponse (frozen module):\nGPNMB, ANXA1, LTF,\nEMP3, C3; rises with\nactivated-myeloid markers",
+          "Broader astrocyte-\ncompartment remodelling\n(consensus signature;\nnot explained by\nmicroglial content)",
+          "In ALS cord: GPNMB, C3\nmicroglial; LTF astrocytic;\nANXA1, EMP3 vascular.\nTracks CD68 and HLA-DR,\nnot CD45 or CD11b",
           "Detected in astrocyte-compartment\nnuclei and in bulk tissue"),
   fill = c("#EFE3DF", "#EAD7A8", "white", "#C9D6E3", "white"))
 model_edges <- data.frame(x = c(1.7, 2.3, 1.05, 1.25, 2.9), y = c(3.95, 3.95, 2.3, 1.0, 2.45),
