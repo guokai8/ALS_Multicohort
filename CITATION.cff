@@ -8,8 +8,8 @@ authors:
     given-names: Zhihan
 repository-code: "https://github.com/guokai8/ALS_Multicohort"
 license: MIT
-version: 1.7.0
-date-released: 2026-10-13
+version: 1.8.0
+date-released: 2026-10-14
 keywords:
   - ALS
   - astrocyte

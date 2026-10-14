@@ -122,4 +122,8 @@ compose("FigS8_evidence_map", "FigureS8_evidence_map", f6$fig, 183, 130, "Fig6_e
 s9 <- P("FigureS9_microglia_adjusted")
 compose("FigS9_microglia_adjusted", "FigureS9_microglia_adjusted", (s9$pa | s9$pb) + plot_layout(widths = c(1.2, 1)) + plot_annotation(tag_levels = "a"),
         183, 95, "FigS9_microglia_adjusted")
+s10 <- P("FigureS10_mouse_cell_source")
+compose("FigS10_mouse_cell_source", "FigureS10_mouse_cell_source",
+        s10$pa / ((s10$pb | s10$pc | s10$pd) + plot_layout(widths = c(1, 1, 1.1))) + plot_layout(heights = c(1, 1.05)) + plot_annotation(tag_levels = "a"),
+        183, 140, "FigS10_mouse_cell_source")
 cat("Figures_v3 written to", V3, "\n")
