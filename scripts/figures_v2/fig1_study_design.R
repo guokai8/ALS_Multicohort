@@ -6,21 +6,20 @@ out <- new_figure_dir("Fig1_study_design")
 
 # ---- a: workflow schematic ----
 boxes <- data.frame(
-  id = c("disc", "mod", "plan", "sn", "meta", "bulk1", "bulk2", "expl"),
-  x = c(1, 1, 1, 0.35, 0.35, 1.65, 1.0, 1.65),
-  y = c(6, 5, 4, 3, 2, 3, 1, 2),
+  id = c("disc", "mod", "plan", "bulk", "sn", "vh", "cell"),
+  x = c(1, 1, 1, 1.6, 0.4, 1.6, 1.6),
+  y = c(6, 5, 4, 3, 3, 2, 1),
   label = c("Discovery: GSE330130 motor cortex\nastrocyte-compartment pseudobulk (11 ALS / 7 ctrl)",
             "Frozen modules: 15 ALS-up / 14 ALS-down genes",
-            "Frozen analysis plan v1.0 + Amendments 1-14\n(committed before each governed analysis)",
-            "Independent snRNA-seq:\n5 contrasts from 4 studies",
-            "Meta-analysis +\n159-gene consensus signature",
-            "NYGC bulk hold-out:\nfrozen modules (test 1)",
-            "NYGC bulk hold-out:\nconsensus signature (test 2)",
-            "Exploratory: cell source, ambient RNA, composition,\npathways, ligand-receptor, Visium spatial context"),
-  role = c("discovery", "discovery", "plan", "consolidation", "consolidation", "confirmatory", "confirmatory", "exploratory")
+            "Time-stamped analysis plan\n(updates committed before each analysis)",
+            "Bulk replication (NYGC hold-out, no discovery donors):\nfrozen modules and consensus signature",
+            "Independent snRNA-seq: 5 contrasts\n(consensus signature; cohort-design audit)",
+            "Spatial localisation: motor vs sensory\nterritory in lumbar and cervical cord",
+            "Cell source: lineage expression,\nspot and protein co-localisation"),
+  role = c("discovery", "discovery", "plan", "confirmatory", "consolidation", "exploratory", "exploratory")
 )
-edges <- data.frame(from = c("disc", "mod", "plan", "plan", "sn", "meta", "bulk1"),
-                    to = c("mod", "plan", "sn", "bulk1", "meta", "bulk2", "expl"))
+edges <- data.frame(from = c("disc", "mod", "plan", "plan", "bulk", "vh"),
+                    to = c("mod", "plan", "bulk", "sn", "vh", "cell"))
 edges <- merge(merge(edges, boxes[, c("id", "x", "y")], by.x = "from", by.y = "id"),
                boxes[, c("id", "x", "y")], by.x = "to", by.y = "id", suffixes = c("", "_end"))
 role_fill <- c(discovery = "#EFE3DF", plan = "#C8C8C8", consolidation = "#C9D6E3", confirmatory = "#EAD7A8", exploratory = "white")

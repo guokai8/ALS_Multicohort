@@ -2,9 +2,9 @@
 
 Analysis code for:
 
-> Guo K, Wang Z. *Cross-cohort validation of an ALS glial transcriptomic signature identifies a ventral-horn myeloid–glial response.* Manuscript submitted to *Molecular Neurodegeneration*.
+> Guo K, Wang Z. *Cross-platform validation of an ALS glial transcriptomic signature reveals a ventral-horn myeloid–glial response.* Manuscript submitted to *Molecular Neurodegeneration*.
 
-The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with fourteen amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
+The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with fifteen amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
 
 ## Contents
 
@@ -12,8 +12,8 @@ The study uses a donor-level discovery cohort (GSE330130) only to define candida
 |---|---|
 | `scripts/` | All analysis scripts, Python and R (see the pipeline below) |
 | `scripts/figures_v2/` | R panel scripts (ggplot2 + patchwork); `compose_figures_v3.R` assembles the submitted main Figures 1-5 and Supplementary Figures S1-S10 |
-| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-14, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
-| `docs/analyses/` | One README per analysis (W32-W72): design, results and reading |
+| `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-15, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
+| `docs/analyses/` | One README per analysis (W32-W73): design, results and reading |
 | `docs/supplementary_tables/` | Supplementary Tables S1-S4 (TSV), as submitted |
 | `metadata/` | Small sample manifests derived from public metadata and read by the scripts |
 
@@ -90,6 +90,7 @@ Run the scripts from the repository root in this order. Each `results/<analysis>
 | **12d. Dose-response and cross-cohort combination** (Amendment 12) | `run_w69_dose_response_and_combination.R` | W69 |
 | **12e. Microglia-adjusted territory test** (Amendment 13) | `run_w70_microglia_adjusted_territory.R` (uses the W67 and W68 territory inputs) | W70 |
 | **12f. Mouse time course and disease-state cell source** (Amendment 14) | `build_w71_maniatis_pseudobulk.py` → `run_w71_mouse_time_course.R`, `run_w71_human_colocalisation.py`; `run_w72_zelic_disease_cell_source.py` → `run_w72_lineage_de.R` | W71, W72 |
+| **12g. Generic inflammation, microglial and ageing signatures** (Amendment 15) | `run_w73_generic_signature_comparison.R` (uses the W67 and W68 territory inputs) | W73 |
 | **13. Figures and tables** | `Rscript scripts/figures_v2/fig1_study_design.R` … `fig7_motor_territory.R`; `figS1_discovery_audit.R`, `figS2_cell_source.R`, `figS3_holdout_genes.R`, `figS4_spatial.R`, `figS5_motor_selectivity.R`, `figS6_dose_response.R`, `figS9_microglia_adjusted.R`, `figS10_mouse_cell_source.R`; `python3 scripts/build_v2_supplementary_tables.py` | `results/Figures_v2/`, `results/Supplementary_Tables_v2/` |
 
 Several scripts check themselves against earlier outputs and stop on mismatch. For example, W60 and W61 reproduce the W58 pools, W62 reproduces the W34 fold changes, and the W55 clinical and W56 E3a gene-level source data must equal the committed set-level results.

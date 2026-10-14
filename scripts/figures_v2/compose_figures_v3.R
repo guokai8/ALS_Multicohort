@@ -23,19 +23,19 @@ f7 <- P("Figure7_motor_territory"); s1 <- P("FigureS1_discovery_audit"); s2 <- P
 s3 <- P("FigureS3_holdout_genes"); s4 <- P("FigureS4_spatial"); s5 <- P("FigureS5_motor_selectivity"); s6 <- P("FigureS6_dose_response")
 
 # ---- Fig. 1: design ----
-compose("Fig1_design", "Figure1_design", (f1$pa | f1$pb) / f1$pc + plot_layout(heights = c(1.15, 1), widths = c(1.15, 1)) +
+compose("Fig1_design", "Figure1_design", (untag(f1$pa) / untag(f1$pc)) + plot_layout(heights = c(1, 1)) +
           plot_annotation(tag_levels = "a"), 183, 150, "Fig1_study_design")
 
 # ---- Fig. 2: single-nucleus replication is shaped by cohort design ----
 top <- (tag(untag(f3$pa), "a") | tag(untag(f3$pb), "b") | tag(untag(f3$pe), "c")) + plot_layout(widths = c(0.75, 1, 1.15))
 mid <- (tag(untag(f3$pc1), "d") | untag(f3$pc2) | tag(untag(f3$pd1), "e") | untag(f3$pd2)) + plot_layout(widths = c(0.8, 0.8, 0.8, 1.25))
 bot <- tag(untag(f4$pa), "f")
-compose("Fig2_single_nucleus_replication", "Figure2_single_nucleus_replication",
+compose("Fig5_single_nucleus_replication", "Figure5_single_nucleus_replication",
         wrap_elements(full = top) / wrap_elements(full = mid) / wrap_elements(full = bot) + plot_layout(heights = c(1.15, 0.9, 1.35)),
         183, 215, c("Fig3_confounding", "Fig4_meta"))
 
 # ---- Fig. 3: confirmation in an independent bulk hold-out ----
-compose("Fig3_bulk_holdout", "Figure3_bulk_holdout",
+compose("Fig2_bulk_holdout", "Figure2_bulk_holdout",
         (tag(untag(f5$pa), "a") | tag(untag(f4$pb), "b") | tag(untag(f5$pb), "c")) + plot_layout(widths = c(1, 1.15, 1)),
         183, 85, c("Fig5_nygc_holdout", "Fig4_meta"))
 
@@ -68,12 +68,12 @@ p4b <- ggplot(co, aes(x = rho_depth_partial, y = lineage, colour = tissue)) +
   labs(x = "Median Spearman rho with module score\n(per section, depth-partial)", y = "Lineage marker score",
        title = "Spot co-localisation (GSE330224)", tag = "b") +
   theme(legend.position = "top", legend.margin = margin(0, 0, 0, 0))
-d4 <- file.path(V3, "Fig5_cell_source", "source_data"); dir.create(d4, recursive = TRUE, showWarnings = FALSE)
+d4 <- file.path(V3, "Fig4_cell_source", "source_data"); dir.create(d4, recursive = TRUE, showWarnings = FALSE)
 write.table(ls_long, file.path(d4, "panel_a_lineage_share_up.tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
 write.table(co, file.path(d4, "panel_b_colocalisation_depth_partial.tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
 
 # ---- Fig. 4: ventral-horn response in two spatial cohorts ----
-compose("Fig4_ventral_horn", "Figure4_ventral_horn",
+compose("Fig3_ventral_horn", "Figure3_ventral_horn",
         (tag(untag(f7$pa), "a") | tag(untag(f7$pb), "b")) + plot_layout(widths = c(1.3, 1)),
         150, 95, "Fig7_motor_territory")
 
@@ -106,7 +106,7 @@ pm <- ggplot() +
   coord_cartesian(xlim = c(0, 18), ylim = c(0.3, 5.8), expand = FALSE, clip = "off") +
   labs(title = "Summary", tag = "d") +
   theme_void(base_family = "Arial") + theme(plot.title = element_text(size = 6.4, face = "bold"), plot.tag = element_text(size = 8, face = "bold"))
-compose("Fig5_cell_source", "Figure5_cell_source",
+compose("Fig4_cell_source", "Figure4_cell_source",
         (p4a | (p4b / tag(untag(f7$pc), "c") + plot_layout(heights = c(1, 1)))) / pm + plot_layout(heights = c(1.75, 0.62)),
         183, 165, "Fig7_motor_territory")
 
