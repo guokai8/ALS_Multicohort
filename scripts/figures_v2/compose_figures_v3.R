@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# Streamlined figure set (manuscript v3): five main figures and eight supplementary figures,
+# Streamlined figure set (manuscript v3): five main figures and ten supplementary figures,
 # assembled from the panel objects saved by the figures_v2 scripts (run those first). The source
 # data of each contributing panel are copied next to the assembled figure.
 
@@ -68,37 +68,47 @@ p4b <- ggplot(co, aes(x = rho_depth_partial, y = lineage, colour = tissue)) +
   labs(x = "Median Spearman rho with module score\n(per section, depth-partial)", y = "Lineage marker score",
        title = "Spot co-localisation (GSE330224)", tag = "b") +
   theme(legend.position = "top", legend.margin = margin(0, 0, 0, 0))
-d4 <- file.path(V3, "Fig4_cell_source", "source_data"); dir.create(d4, recursive = TRUE, showWarnings = FALSE)
+d4 <- file.path(V3, "Fig5_cell_source", "source_data"); dir.create(d4, recursive = TRUE, showWarnings = FALSE)
 write.table(ls_long, file.path(d4, "panel_a_lineage_share_up.tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
 write.table(co, file.path(d4, "panel_b_colocalisation_depth_partial.tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-compose("Fig4_cell_source", "Figure4_cell_source",
-        (p4a | (p4b / tag(untag(f7$pc), "c") + plot_layout(heights = c(1, 1)))) + plot_layout(widths = c(1, 1)),
-        183, 110, "Fig7_motor_territory")
 
-# ---- Fig. 5: ventral-horn response in two spatial cohorts, and working model ----
-model_boxes <- data.frame(
-  x = c(2, 1.05, 2.95, 1.05, 2),
-  y = c(4.3, 2.95, 2.95, 1.6, 0.35),
-  lab = c("ALS: lower motor neuron\nloss in the ventral horn",
-          "Focal ventral-horn\nresponse (frozen module):\nGPNMB, ANXA1, LTF,\nEMP3, C3; rises with\nactivated-myeloid markers",
-          "Broader astrocyte-\ncompartment remodelling\n(consensus signature;\nnot explained by\nmicroglial content)",
-          "In ALS cord: GPNMB, C3\nmicroglial; LTF astrocytic;\nANXA1, EMP3 vascular.\nTracks CD68 and HLA-DR,\nnot CD45 or CD11b",
-          "Detected in astrocyte-compartment\nnuclei and in bulk tissue"),
-  fill = c("#EFE3DF", "#EAD7A8", "white", "#C9D6E3", "white"))
-model_edges <- data.frame(x = c(1.7, 2.3, 1.05, 1.25, 2.9), y = c(3.95, 3.95, 2.3, 1.0, 2.45),
-                          xend = c(1.2, 2.8, 1.05, 1.7, 2.35), yend = c(3.5, 3.5, 2.15, 0.7, 0.7))
+# ---- Fig. 4: ventral-horn response in two spatial cohorts ----
+compose("Fig4_ventral_horn", "Figure4_ventral_horn",
+        (tag(untag(f7$pa), "a") | tag(untag(f7$pb), "b")) + plot_layout(widths = c(1.3, 1)),
+        150, 95, "Fig7_motor_territory")
+
+# ---- Fig. 5: cell source, with a summary schematic (d) ----
+stage <- data.frame(xmin = c(0.2, 5.4, 10.6), xmax = c(4.6, 9.8, 17.8), ymin = 1.15, ymax = 5.6,
+                    fill = c("#EFE3DF", "#EAD7A8", "#F4F4F4"))
+stage_txt <- data.frame(
+  x = c(2.4, 7.6, 14.2), y = 5.15,
+  lab = c("Discovery", "Replication", "Spinal ventral horn"))
+body_txt <- data.frame(
+  x = c(2.4, 7.6, 14.2), y = c(3.3, 3.3, 4.35),
+  lab = c("Astrocyte-compartment nuclei\n(motor cortex, 18 donors)\n\n15-gene ALS-up module",
+          "Independent bulk tissue\n(no discovery donors)\n\nModule higher in ALS in\nmotor cortex and spinal cord",
+          "Rises more than in sensory territory\n(lumbar and cervical cord)"))
+cells <- data.frame(x = 11.5, y = c(3.25, 2.4, 1.6), shape = c(21, 23, 22),
+                    fill = c(PAL$als, PAL$accent, PAL$control),
+                    lab = c("Microglia: GPNMB, C3 (tracks CD68 and HLA-DR protein)",
+                            "Astrocytes: LTF (and ALS-associated GPNMB, C3)",
+                            "Vascular cells: ANXA1, EMP3"))
 pm <- ggplot() +
-  geom_segment(data = model_edges, aes(x = x, y = y, xend = xend, yend = yend), linewidth = 0.35, colour = PAL$neutral,
-               arrow = arrow(length = unit(1.1, "mm"), type = "closed")) +
-  geom_label(data = model_boxes, aes(x = x, y = y, label = lab, fill = I(fill)), size = 1.7, family = "Arial", lineheight = 0.92,
-             linewidth = 0.25, label.r = unit(0.6, "mm"), label.padding = unit(1, "mm")) +
-  coord_cartesian(xlim = c(0.3, 3.7), ylim = c(-0.05, 4.7), clip = "off") +
-  labs(title = "Working model", subtitle = "Not a demonstrated mechanism", tag = "c") +
-  theme_void(base_family = "Arial") + theme(plot.title = element_text(size = 6.4, face = "bold"), plot.subtitle = element_text(size = 5.6, colour = "#555555"),
-                                             plot.tag = element_text(size = 8, face = "bold"))
-compose("Fig5_ventral_horn", "Figure5_ventral_horn",
-        (tag(untag(f7$pa), "a") | tag(untag(f7$pb), "b") | pm) + plot_layout(widths = c(1.25, 0.9, 1.3)),
-        183, 95, "Fig7_motor_territory")
+  geom_rect(data = stage, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = I(fill)), colour = PAL$ink, linewidth = 0.25) +
+  annotate("segment", x = c(4.7, 9.9), xend = c(5.3, 10.5), y = 3.4, yend = 3.4, linewidth = 0.4, colour = PAL$neutral,
+           arrow = arrow(length = unit(1.2, "mm"), type = "closed")) +
+  geom_text(data = stage_txt, aes(x = x, y = y, label = lab), size = 2.1, fontface = "bold", family = "Arial") +
+  geom_text(data = body_txt, aes(x = x, y = y, label = lab), size = 1.8, family = "Arial", lineheight = 0.95) +
+  geom_point(data = cells, aes(x = x, y = y, shape = I(shape), fill = I(fill)), size = 3, stroke = 0.35, colour = PAL$ink) +
+  geom_text(data = cells, aes(x = x + 0.45, y = y, label = lab), hjust = 0, size = 1.8, family = "Arial") +
+  annotate("text", x = 9, y = 0.55, size = 1.6, family = "Arial", colour = "#555555",
+           label = "Each leading gene is placed in the lineage with its highest per-lineage expression in ALS spinal cord. Summary of the evidence, not a demonstrated mechanism.") +
+  coord_cartesian(xlim = c(0, 18), ylim = c(0.3, 5.8), expand = FALSE, clip = "off") +
+  labs(title = "Summary", tag = "d") +
+  theme_void(base_family = "Arial") + theme(plot.title = element_text(size = 6.4, face = "bold"), plot.tag = element_text(size = 8, face = "bold"))
+compose("Fig5_cell_source", "Figure5_cell_source",
+        (p4a | (p4b / tag(untag(f7$pc), "c") + plot_layout(heights = c(1, 1)))) / pm + plot_layout(heights = c(1.75, 0.62)),
+        183, 165, "Fig7_motor_territory")
 
 # ---- Supplementary figures ----
 compose("FigS1_discovery_audit", "FigureS1_discovery_audit",
@@ -106,24 +116,24 @@ compose("FigS1_discovery_audit", "FigureS1_discovery_audit",
         183, 140, "FigS1_discovery_audit")
 compose("FigS2_contamination", "FigureS2_contamination", (untag(f2$pa) | untag(f2$pb)) + plot_annotation(tag_levels = "a"),
         183, 75, "Fig2_contamination_cell_source")
-compose("FigS3_cell_source", "FigureS3_cell_source",
+compose("FigS8_cell_source", "FigureS8_cell_source",
         (s2$pa | (s2$pb / s2$pc + plot_layout(heights = c(1, 1.15)))) + plot_layout(widths = c(0.9, 1.1)) + plot_annotation(tag_levels = "a"),
         183, 150, "FigS2_cell_source")
-compose("FigS4_holdout_genes_clinical", "FigureS4_holdout_genes_clinical",
+compose("FigS3_holdout_genes_clinical", "FigureS3_holdout_genes_clinical",
         untag(s3$pa) / (untag(f5$pc1) | untag(f5$pc2)) + plot_layout(heights = c(1.5, 1)) + plot_annotation(tag_levels = list(c("a", "b", ""))),
         183, 190, c("FigS3_holdout_genes", "Fig5_nygc_holdout"))
-compose("FigS5_spatial_lumbar_cortex", "FigureS5_spatial_lumbar_cortex",
+compose("FigS4_spatial_lumbar_cortex", "FigureS4_spatial_lumbar_cortex",
         (untag(s4$pa) | untag(s4$pb)) / (untag(s4$pc) | untag(s4$pd)) + plot_layout(heights = c(1.15, 1)) + plot_annotation(tag_levels = "a"),
         183, 190, "FigS4_spatial")
-compose("FigS6_lumbar_territory", "FigureS6_lumbar_territory",
+compose("FigS5_lumbar_territory", "FigureS5_lumbar_territory",
         (untag(s5$pa) | untag(s5$pb)) + plot_layout(widths = c(2, 1)) + plot_annotation(tag_levels = "a"), 183, 105, "FigS5_motor_selectivity")
-compose("FigS7_dose_response", "FigureS7_dose_response", s6$pa, 140, 100, "FigS6_dose_response")
-compose("FigS8_evidence_map", "FigureS8_evidence_map", f6$fig, 183, 130, "Fig6_evidence_map")
+compose("FigS6_dose_response", "FigureS6_dose_response", s6$pa, 140, 100, "FigS6_dose_response")
+compose("FigS10_evidence_map", "FigureS10_evidence_map", f6$fig, 183, 130, "Fig6_evidence_map")
 s9 <- P("FigureS9_microglia_adjusted")
 compose("FigS9_microglia_adjusted", "FigureS9_microglia_adjusted", (s9$pa | s9$pb) + plot_layout(widths = c(1.2, 1)) + plot_annotation(tag_levels = "a"),
         183, 95, "FigS9_microglia_adjusted")
 s10 <- P("FigureS10_mouse_cell_source")
-compose("FigS10_mouse_cell_source", "FigureS10_mouse_cell_source",
+compose("FigS7_mouse_cell_source", "FigureS7_mouse_cell_source",
         s10$pa / ((s10$pb | s10$pc | s10$pd) + plot_layout(widths = c(1, 1, 1.1))) + plot_layout(heights = c(1, 1.05)) + plot_annotation(tag_levels = "a"),
         183, 140, "FigS10_mouse_cell_source")
 cat("Figures_v3 written to", V3, "\n")

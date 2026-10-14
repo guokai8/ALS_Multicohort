@@ -2,7 +2,7 @@
 
 Analysis code for:
 
-> Guo K, Wang Z. *Prespecified cross-cohort testing localises an astrocyte-compartment ALS signature to a multicellular myeloid–glial response in the spinal ventral horn.* Manuscript submitted to *Molecular Neurodegeneration*.
+> Guo K, Wang Z. *Cross-cohort validation of an ALS glial transcriptomic signature identifies a ventral-horn myeloid–glial response.* Manuscript submitted to *Molecular Neurodegeneration*.
 
 The study uses a donor-level discovery cohort (GSE330130) only to define candidate ALS-up and ALS-down modules from astrocyte-compartment nuclei. It then tests them in five external single-nucleus contrasts from four studies and in the NYGC ALS Consortium bulk RNA-seq resource, under a time-stamped analysis plan with fourteen amendments. Exploratory analyses place the reproducible programme in its cell-source, pathway, ligand-receptor and Visium spatial context.
 
