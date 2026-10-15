@@ -5,7 +5,7 @@
 source(file.path(dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1]))), "fig_common.R"))
 out <- new_figure_dir("Fig7_motor_territory")
 cohort_lab <- c(W67 = "Lumbar cord\n18 ALS / 5 ctrl", W68 = "Cervical cord\n9 ALS / 7 ctrl")
-set_lab <- c(up = "Frozen\nALS-up")
+set_lab <- c(up = "ALS-up\nmodule")
 
 # ---- a: ALS effect in motor vs sensory grey matter, interaction P ----
 w67 <- read.delim(file.path(RES, "W67_motor_selectivity", "w67_motor_selectivity_tests.tsv"))

@@ -42,7 +42,7 @@ a$region <- factor(region_lab[a$region], levels = region_lab)
 a$arm <- factor(ifelse(a$module == "up", "ALS-up module", "ALS-down module"), levels = c("ALS-up module", "ALS-down module"))
 a$label <- ifelse(a$analysis == "Primary", paste0("FDR ", fmt_p(a$fry_BH)), NA)
 write_source(a, out, "panel_a_frozen_module_tests")
-pa <- p_dotplot(a, "Frozen 15/14-gene modules", c("ALS-up module" = PAL$up, "ALS-down module" = PAL$down))
+pa <- p_dotplot(a, "ALS-up and ALS-down modules", c("ALS-up module" = PAL$up, "ALS-down module" = PAL$down))
 
 # ---- b: frozen consensus signature (W59) ----
 w59 <- read.delim(list.files(RES, pattern = "^w59_signature_tests.tsv$", recursive = TRUE, full.names = TRUE)[1])
@@ -57,7 +57,7 @@ b$arm <- factor(ifelse(b$module == "up_consensus", "Consensus up (85)", "Consens
                 levels = c("Consensus up (85)", "Consensus down (73)"))
 b$label <- ifelse(b$analysis == "Primary", paste0("FDR ", fmt_p(b$fry_BH)), NA)
 write_source(b, out, "panel_b_consensus_signature_tests")
-pb <- p_dotplot(b, "Frozen consensus signature", c("Consensus up (85)" = PAL$up, "Consensus down (73)" = PAL$down))
+pb <- p_dotplot(b, "Consensus signature", c("Consensus up (85)" = PAL$up, "Consensus down (73)" = PAL$down))
 
 # ---- c: clinical association within ALS donors (W55 clinical models) ----
 coef <- read.delim(file.path(W55, "w55_clinical_coefficients_with_ci.tsv"))

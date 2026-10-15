@@ -11,7 +11,7 @@ The study uses a donor-level discovery cohort (GSE330130) only to define candida
 | Path | Contents |
 |---|---|
 | `scripts/` | All analysis scripts, Python and R (see the pipeline below) |
-| `scripts/figures_v2/` | R panel scripts (ggplot2 + patchwork); `compose_figures_v3.R` assembles the submitted main Figures 1-5 and Supplementary Figures S1-S10 |
+| `scripts/figures_v2/` | R panel scripts (ggplot2 + patchwork); `compose_figures_v3.R` assembles the submitted main Figures 1-5, Supplementary Figures S1-S10 and the graphical abstract |
 | `docs/analysis_plans/` | The frozen analysis plan (v1.0) and Amendments 1-16, byte-identical to the files whose SHA-256 values are listed in Supplementary Table S1 |
 | `docs/analyses/` | One README per analysis (W32-W74): design, results and reading |
 | `docs/supplementary_tables/` | Supplementary Tables S1-S4 (TSV), as submitted |

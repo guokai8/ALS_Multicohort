@@ -9,7 +9,7 @@ tissue_lab <- c(LSC = "Lumbar spinal cord", MTC = "Motor cortex")
 # ---- a: disease shift by unit (independent donors) ----
 st <- read.delim(file.path(w66, "w66_set_tests.tsv"))
 st <- st[st$analysis == "primary", ]
-set_lab <- c(up = "Frozen ALS-up", up_consensus = "Consensus up", down_consensus = "Consensus down")
+set_lab <- c(up = "ALS-up module", up_consensus = "Consensus up", down_consensus = "Consensus down")
 st <- st[st$gene_set %in% names(set_lab), ]
 unit_order <- c("whole", "grey", "white", "edge", "L1", "L2_3", "L5_6", "WM",
                 "astrocyte_only", "astrocyte_rich", "vascular_rich", "microglia_rich")

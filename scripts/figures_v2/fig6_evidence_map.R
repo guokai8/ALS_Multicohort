@@ -56,7 +56,7 @@ col1 <- do.call(rbind, lapply(lineage_order, function(l) {
 
 # ---- column 2: what is reproducible ----
 col2 <- data.frame(
-  title = c("Frozen ALS-up module (15 genes)",
+  title = c("ALS-up module (15 genes)",
             "Bulk hold-out, frozen module (W55)",
             "Bulk hold-out, 158-gene consensus (W59)",
             "snRNA-seq meta-analysis (W58)",

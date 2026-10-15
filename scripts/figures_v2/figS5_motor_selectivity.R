@@ -8,7 +8,7 @@ cmp_lab <- c(grey_ventral_vs_dorsal_horn = "Spinal grey:\nventral vs\ndorsal hor
              white_lateral_funiculus_vs_dorsal_columns = "Spinal white:\nlateral funiculus vs\ndorsal columns",
              cortex_layer5_vs_layer2_3 = "Motor cortex:\nlayer 5 vs\nlayers 2-3")
 terr_lab <- c(ALS_in_motor = "Motor", ALS_in_sensory = "Sensory")
-set_lab <- c(up = "Frozen ALS-up", up_consensus = "Consensus up", down_consensus = "Consensus down")
+set_lab <- c(up = "ALS-up module", up_consensus = "Consensus up", down_consensus = "Consensus down")
 
 # ---- a: ALS effect in each territory, with the interaction P ----
 st <- read.delim(file.path(w67, "w67_motor_selectivity_tests.tsv"))

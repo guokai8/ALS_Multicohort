@@ -32,13 +32,14 @@ s3 <- P("FigureS3_holdout_genes"); s4 <- P("FigureS4_spatial"); s5 <- P("FigureS
 compose("Fig1_design", "Figure1_design", (untag(f1$pa) / untag(f1$pc)) + plot_layout(heights = c(1, 1)) +
           plot_annotation(tag_levels = "a"), 183, 150, "Fig1_study_design")
 
-# ---- Fig. 2: single-nucleus replication is shaped by cohort design ----
-top <- (tag(untag(f3$pa), "a") | tag(untag(f3$pb), "b") | tag(untag(f3$pe), "c")) + plot_layout(widths = c(0.75, 1, 1.15))
-mid <- (tag(untag(f3$pc1), "d") | untag(f3$pc2) | tag(untag(f3$pd1), "e") | untag(f3$pd2)) + plot_layout(widths = c(0.8, 0.8, 0.8, 1.25))
-bot <- tag(untag(f4$pa), "f")
+# ---- Fig. 5: single-nucleus replication is shaped by cohort design (condensed, ALS-up module only) ----
+up_only <- function(p) { p$data <- droplevels(p$data[p$data$module == "ALS-up", ]); p }
+top <- (tag(untag(f3$pa), "a") | tag(untag(f3$pc1), "b") | untag(up_only(f3$pc2))) + plot_layout(widths = c(1, 0.8, 0.7))
+li <- (tag(untag(f3$pd1), "c") | untag(up_only(f3$pd2))) + plot_layout(widths = c(0.8, 0.9))
+bot <- (wrap_elements(full = li) | wrap_elements(full = tag(untag(f4$pa_up), "d"))) + plot_layout(widths = c(1, 1.3))
 compose("Fig5_single_nucleus_replication", "Figure5_single_nucleus_replication",
-        wrap_elements(full = top) / wrap_elements(full = mid) / wrap_elements(full = bot) + plot_layout(heights = c(1.15, 0.9, 1.35)),
-        183, 215, c("Fig3_cohort_confounding", "Fig4_meta_analysis:panel_a"))
+        wrap_elements(full = top) / wrap_elements(full = bot) + plot_layout(heights = c(1, 1.15)),
+        183, 165, c("Fig3_cohort_confounding:panel_a|panel_c|panel_d", "Fig4_meta_analysis:panel_a"))
 
 # ---- Fig. 3: confirmation in an independent bulk hold-out ----
 compose("Fig2_bulk_holdout", "Figure2_bulk_holdout",
@@ -84,42 +85,71 @@ compose("Fig3_ventral_horn", "Figure3_ventral_horn",
         150, 80, "Fig7_motor_territory:panel_a|panel_b")
 
 # ---- Fig. 5: cell source, with a summary schematic (d) ----
-stage <- data.frame(xmin = c(0.2, 5.4, 10.6), xmax = c(4.6, 9.8, 17.8), ymin = 1.15, ymax = 5.6,
-                    fill = c("#EFE3DF", "#EAD7A8", "#F4F4F4"))
+stage <- data.frame(xmin = c(0.2, 4.4, 8.6, 18.4), xmax = c(3.8, 8.0, 17.6, 22.6), ymin = 1.15, ymax = 5.6,
+                    fill = c("#EFE3DF", "#EAD7A8", "#F4F4F4", "#FFFFFF"))
 stage_txt <- data.frame(
-  x = c(2.4, 7.6, 14.2), y = 5.15,
-  lab = c("Discovery", "Replication", "Spinal ventral horn"))
+  x = c(2.0, 6.2, 13.1, 20.5), y = 5.15,
+  lab = c("Discovery", "Replication", "Spinal ventral horn", "Interpretation"))
 body_txt <- data.frame(
-  x = c(2.4, 7.6, 14.2), y = c(3.3, 3.3, 4.35),
-  lab = c("Astrocyte-compartment nuclei\n(motor cortex, 18 donors)\n\n15-gene ALS-up module",
-          "Independent bulk tissue\n(no discovery donors)\n\nModule higher in ALS in\nmotor cortex and spinal cord",
-          "Rises more than in sensory territory\n(lumbar and cervical cord)"))
-cells <- data.frame(x = 11.5, y = c(3.25, 2.4, 1.6), shape = c(21, 23, 22),
+  x = c(2.0, 6.2, 13.1, 20.5), y = c(3.3, 3.3, 4.35, 3.3),
+  lab = c("Astrocyte-compartment\nnuclei (motor cortex,\n18 donors)\n\n15-gene ALS-up module",
+          "Independent bulk tissue\n(no discovery donors)\n\nModule higher in ALS\nin motor cortex and\nspinal cord",
+          "Rises more than in sensory territory\n(lumbar and cervical cord)",
+          "A multicellular\nactivation state with\na dominant myeloid\ncomponent, in the\nmotor territory"))
+cells <- data.frame(x = 9.4, y = c(3.25, 2.4, 1.6), shape = c(21, 23, 22),
                     fill = c(PAL$als, PAL$accent, PAL$control),
                     lab = c("Microglia: GPNMB, C3 (tracks CD68 and HLA-DR protein)",
                             "Astrocytes: LTF (and ALS-associated GPNMB, C3)",
                             "Vascular cells: ANXA1, EMP3"))
-pm <- ggplot() +
+summary_panel <- function(k = 1) ggplot() +
   geom_rect(data = stage, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = I(fill)), colour = PAL$ink, linewidth = 0.25) +
-  annotate("segment", x = c(4.7, 9.9), xend = c(5.3, 10.5), y = 3.4, yend = 3.4, linewidth = 0.4, colour = PAL$neutral,
+  annotate("segment", x = c(3.85, 8.05, 17.65), xend = c(4.35, 8.55, 18.35), y = 3.4, yend = 3.4, linewidth = 0.4, colour = PAL$neutral,
            arrow = arrow(length = unit(1.2, "mm"), type = "closed")) +
-  geom_text(data = stage_txt, aes(x = x, y = y, label = lab), size = 2.1, fontface = "bold", family = "Arial") +
-  geom_text(data = body_txt, aes(x = x, y = y, label = lab), size = 1.8, family = "Arial", lineheight = 0.95) +
-  geom_point(data = cells, aes(x = x, y = y, shape = I(shape), fill = I(fill)), size = 3, stroke = 0.35, colour = PAL$ink) +
-  geom_text(data = cells, aes(x = x + 0.45, y = y, label = lab), hjust = 0, size = 1.8, family = "Arial") +
-  annotate("text", x = 9, y = 0.55, size = 1.6, family = "Arial", colour = "#555555",
+  geom_text(data = stage_txt, aes(x = x, y = y, label = lab), size = 2.1 * k, fontface = "bold", family = "Arial") +
+  geom_text(data = body_txt, aes(x = x, y = y, label = lab), size = 1.8 * k, family = "Arial", lineheight = 0.95) +
+  geom_point(data = cells, aes(x = x, y = y, shape = I(shape), fill = I(fill)), size = 3 * k, stroke = 0.35, colour = PAL$ink) +
+  geom_text(data = cells, aes(x = x + 0.45, y = y, label = lab), hjust = 0, size = 1.8 * k, family = "Arial") +
+  annotate("text", x = 11.4, y = 0.55, size = 1.6 * k, family = "Arial", colour = "#555555",
            label = "Each leading gene is placed in the lineage with its highest per-lineage expression in ALS spinal cord. Summary of the evidence, not a demonstrated mechanism.") +
-  coord_cartesian(xlim = c(0, 18), ylim = c(0.3, 5.8), expand = FALSE, clip = "off") +
+  coord_cartesian(xlim = c(0, 22.8), ylim = c(0.3, 5.8), expand = FALSE, clip = "off") +
   labs(title = "Summary", tag = "d") +
-  theme_void(base_family = "Arial") + theme(plot.title = element_text(size = 6.4, face = "bold"), plot.tag = element_text(size = 8, face = "bold"))
+  theme_void(base_family = "Arial") + theme(plot.title = element_text(size = 6.4 * k, face = "bold"), plot.tag = element_text(size = 8 * k, face = "bold"))
+pm <- summary_panel()
+# Graphical abstract (journal: landscape, about 920 x 300 px, white background)
+ga_box <- data.frame(xmin = c(0, 3.1, 6.2, 9.3, 13.6), xmax = c(2.8, 5.9, 9.0, 13.3, 16.4),
+                     fill = c("#EFE3DF", "#EAD7A8", "#F4F4F4", "#F4F4F4", "#FFFFFF"),
+                     head = c("Discovery", "Replication", "Localisation", "Cell source", "Interpretation"),
+                     body = c("ALS signature in\nastrocyte-\ncompartment nuclei\n(15 genes)",
+                              "Higher in ALS in\nindependent bulk\nmotor cortex and\nspinal cord",
+                              "Rises in the spinal\nventral horn, where\nmotor neurons\ndegenerate",
+                              "", "Multicellular state\nwith a dominant\nmyeloid component"))
+ga_cells <- data.frame(x = 9.6, y = c(2.45, 1.75, 1.05), shape = c(21, 23, 22), fill = c(PAL$als, PAL$accent, PAL$control),
+                       lab = c("Microglia: GPNMB, C3", "Astrocytes: LTF", "Vascular: ANXA1, EMP3"))
+ga <- ggplot() +
+  geom_rect(data = ga_box, aes(xmin = xmin, xmax = xmax, ymin = 0.5, ymax = 4.5, fill = I(fill)), colour = PAL$ink, linewidth = 0.35) +
+  annotate("segment", x = c(2.85, 5.95, 9.05, 13.35), xend = c(3.05, 6.15, 9.25, 13.55), y = 2.5, yend = 2.5,
+           linewidth = 0.5, colour = PAL$neutral, arrow = arrow(length = unit(1.3, "mm"), type = "closed")) +
+  geom_text(data = ga_box, aes(x = (xmin + xmax) / 2, y = 4.05, label = head), size = 3.3, fontface = "bold", family = "Arial") +
+  geom_text(data = ga_box, aes(x = (xmin + xmax) / 2, y = 2.25, label = body), size = 2.75, family = "Arial", lineheight = 0.95) +
+  geom_point(data = ga_cells, aes(x = x, y = y, shape = I(shape), fill = I(fill)), size = 3.4, stroke = 0.4, colour = PAL$ink) +
+  geom_text(data = ga_cells, aes(x = x + 0.3, y = y, label = lab), hjust = 0, size = 2.75, family = "Arial") +
+  coord_cartesian(xlim = c(-0.05, 16.45), ylim = c(0.45, 4.55), expand = FALSE) +
+  theme_void(base_family = "Arial") + theme(plot.background = element_rect(fill = "white", colour = NA))
+dir.create(file.path(V3, "Graphical_abstract"), showWarnings = FALSE)
+ggsave(file.path(V3, "Graphical_abstract", "graphical_abstract.png"), ga, width = 920 / 150, height = 300 / 150, dpi = 150, bg = "white")
+
 compose("Fig4_cell_source", "Figure4_cell_source",
         (p4a | (p4b / tag(untag(f7$pc), "c") + plot_layout(heights = c(1, 1)))) / pm + plot_layout(heights = c(1.75, 0.62)),
         183, 165, "Fig7_motor_territory:panel_c")
 
 # ---- Supplementary figures ----
-compose("FigS1_discovery_audit", "FigureS1_discovery_audit",
-        ((s1$pa | s1$pb) + plot_layout(widths = c(0.7, 1.3))) / ((s1$pc | s1$pd) + plot_layout(widths = c(1, 1.2))) + plot_annotation(tag_levels = "a"),
-        183, 140, "FigS1_discovery_audit")
+# Cohort-design audits: discovery cohort (a-d) and the independent single-nucleus cohorts (e-g, from former main Fig. 5)
+compose("FigS1_cohort_design_audit", "FigureS1_cohort_design_audit",
+        wrap_elements(full = ((tag(untag(s1$pa), "a") | tag(untag(s1$pb), "b")) + plot_layout(widths = c(0.7, 1.3)))) /
+          wrap_elements(full = ((tag(untag(s1$pc), "c") | tag(untag(s1$pd), "d")) + plot_layout(widths = c(1, 1.2)))) /
+          wrap_elements(full = ((tag(untag(f3$pb), "e") | tag(untag(f3$pe), "f")) + plot_layout(widths = c(1, 1.15)))) /
+          wrap_elements(full = tag(untag(f4$pa), "g")) + plot_layout(heights = c(1, 1, 1, 1.25)),
+        183, 280, c("FigS1_discovery_audit", "Fig3_cohort_confounding:panel_b|panel_e", "Fig4_meta_analysis:panel_a"))
 compose("FigS2_contamination", "FigureS2_contamination", (untag(f2$pa) | untag(f2$pb)) + plot_annotation(tag_levels = "a"),
         183, 75, "Fig2_contamination_cell_source")
 compose("FigS8_cell_source", "FigureS8_cell_source",

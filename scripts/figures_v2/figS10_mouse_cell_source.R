@@ -14,14 +14,14 @@ t <- read.delim(file.path(w71, "w71_mouse_tests.tsv"))
 t <- t[t$comparison == "grey" & !t$adjusted & t$gene_set == "up" & t$contrast %in% c("ventral", "dorsal"), ]
 g <- read.delim(file.path(w71, "w71_mouse_gene_effects.tsv"))
 g <- g[g$comparison == "grey" & !g$adjusted & g$gene == "C3" & g$contrast %in% c("ventral", "dorsal"), ]
-a <- rbind(data.frame(what = "Frozen ALS-up module (median)", age = t$age, contrast = t$contrast, logFC = t$median_logFC, sig = t$fry_p < 0.05),
+a <- rbind(data.frame(what = "ALS-up module (median)", age = t$age, contrast = t$contrast, logFC = t$median_logFC, sig = t$fry_p < 0.05),
            data.frame(what = "C3", age = g$age, contrast = g$contrast, logFC = g$logFC, sig = g$P < 0.05))
 a$age <- factor(age_lab[a$age], levels = age_lab)
 a$territory <- factor(ifelse(a$contrast == "ventral", "Ventral horn", "Dorsal horn"), levels = c("Ventral horn", "Dorsal horn"))
-a$what <- factor(a$what, levels = c("Frozen ALS-up module (median)", "C3"))
+a$what <- factor(a$what, levels = c("ALS-up module (median)", "C3"))
 ti <- read.delim(file.path(w71, "w71_mouse_tests.tsv"))
 ti <- ti[ti$comparison == "grey" & !ti$adjusted & ti$gene_set == "up" & ti$contrast == "interaction", ]
-lab <- data.frame(what = factor("Frozen ALS-up module (median)", levels = levels(a$what)), age = factor(age_lab[ti$age], levels = age_lab),
+lab <- data.frame(what = factor("ALS-up module (median)", levels = levels(a$what)), age = factor(age_lab[ti$age], levels = age_lab),
                   label = paste0("int. P = ", formatC(ti$fry_p, format = "fg", digits = 2)), y = max(a$logFC) * 1.12)
 write_source(a, out, "panel_a_mouse_time_course")
 pa <- ggplot(a, aes(x = age, y = logFC, colour = territory, group = territory)) +

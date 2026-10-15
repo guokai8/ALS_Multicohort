@@ -39,7 +39,7 @@ pa <- ggplot(g, aes(x = logFC, y = gene)) +
   scale_colour_manual(values = c("ALS-up module" = PAL$up, "ALS-down module" = PAL$down), guide = "none") +
   scale_alpha_manual(values = c(`TRUE` = 1, `FALSE` = 0.45), labels = c(`TRUE` = "P < 0.05", `FALSE` = "P ≥ 0.05"), name = NULL) +
   labs(x = expression("ALS vs control log"[2]*" fold change (NYGC bulk)"), y = NULL,
-       title = "Frozen module genes in the bulk hold-out") +
+       title = "Module genes in the bulk hold-out") +
   theme(legend.position = "bottom", strip.text.y = element_text(angle = 0, hjust = 0))
 
 save_panels(list(pa = pa), "FigureS3_holdout_genes")

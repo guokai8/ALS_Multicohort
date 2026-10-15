@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import re
 import subprocess
 from pathlib import Path
 
@@ -591,7 +592,7 @@ def build_s4() -> dict[str, pd.DataFrame]:
 
 
 README_ROWS = [
-    ("Supplementary Table S1", "Frozen analysis plan and sixteen amendments: version-control commit, commit time, SHA-256 and the analysis each governs. Each amendment's commit precedes its governed result commit."),
+    ("Supplementary Table S1", "Analysis plan (v1.0) and the sixteen later analysis documents, each written down and time-stamped before the analysis it describes: version-control commit, commit time, SHA-256 and the analysis described. Each document's commit precedes the commit of its results."),
     ("Supplementary Table S2", "Registry of every test of the frozen modules and of the consensus signature, including the superseded W08 module test, pre-plan checks (W50-W54) and governed analyses (W55-W62, W64, W66-W71, W73, W74). phase gives the status of each test; null and post hoc results are included."),
     ("Supplementary Table S3", "Deviations from the frozen plan and amendments, with reasons and timing."),
     ("Supplementary Table S4", "Exploratory biological context (Amendments 8-15): S4a themed and Hallmark preranked GSEA on the discovery-agnostic meta statistic (W63); S4b over-representation in the consensus arms (W63); S4c frozen module genes in the NYGC consortium's bulk DE, Flagship ST4, which includes discovery donors (W64); S4d ligand-receptor pairs involving module genes, evaluable in both Pineda BA9 and Ulm (W65; no P values); S4e-S4g GSE330224 Visium region share, spot co-localisation and ligand-receptor co-detection with its matched-random-pair null (W66, Amendments 9 and 10); S4h gene-level ALS effects in motor and sensory spinal-cord territories (W67, Amendment 10); S4i the same in the independent GSE288365 cohort and S4j spot-level protein co-localisation there (W68, Amendment 11); S4k donor-level motor-neuron index and module response (W69, Amendment 12); S4l-S4m microglia-adjusted territory interaction and microglial score by territory (W70, Amendment 13); S4n gene-level SOD1-G93A effects by age and territory and S4o human co-localisation in Maniatis et al. 2019 (W71, Amendment 14); S4p disease-state lineage share and S4q within-lineage ALS vs control effects of the module genes in GSE287257 (W72, Amendment 14); S4r the ALS-up module and consensus up arm adjusted for generic inflammation, TYROBP-network and ageing scores, and S4s those generic sets in the territory test (W73, Amendment 15)."),
@@ -599,14 +600,30 @@ README_ROWS = [
 ]
 
 
+def plain_wording(text: object) -> object:
+    """Reader-facing wording: 'Amendment N' becomes 'analysis document N' (file paths keep their names)."""
+    if not isinstance(text, str):
+        return text
+    text = re.sub(r"\bAmendments (\d+)", r"analysis documents \1", text)
+    text = re.sub(r"\bAmendment (\d+)", r"analysis document \1", text)
+    text = re.sub(r"\bamendments\b", "analysis documents", text)
+    text = re.sub(r"\bamendment\b", "analysis document", text)
+    return text[:1].upper() + text[1:] if text.startswith("analysis document") else text
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     OUT.mkdir(parents=True, exist_ok=True)
-    tables = {"S1_plan_and_amendments": build_s1(), "S2_test_registry": build_s2(), "S3_deviations": build_s3(), **build_s4()}
+    tables = {"S1_analysis_plan_documents": build_s1(), "S2_test_registry": build_s2(), "S3_deviations": build_s3(), **build_s4()}
+    for name in ("S1_analysis_plan_documents", "S2_test_registry", "S3_deviations"):
+        df = tables[name]
+        for col in df.columns:
+            if col not in ("document", "source_file", "evidence"):
+                df[col] = df[col].map(plain_wording)
     for name, df in tables.items():
         df.to_csv(OUT / f"Supplementary_Table_{name}.tsv", sep="\t", index=False)
         logger.info("%s: %d rows", name, len(df))
-    readme = pd.DataFrame(README_ROWS, columns=["table", "description"])
+    readme = pd.DataFrame([(t, plain_wording(d)) for t, d in README_ROWS], columns=["table", "description"])
     with pd.ExcelWriter(OUT / "Supplementary_Tables_S1-S4.xlsx") as xl:
         readme.to_excel(xl, sheet_name="README", index=False)
         for name, df in tables.items():

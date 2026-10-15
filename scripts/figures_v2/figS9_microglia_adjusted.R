@@ -5,7 +5,7 @@ source(file.path(dirname(normalizePath(sub("^--file=", "", grep("^--file=", comm
 out <- new_figure_dir("FigS9_microglia_adjusted")
 w70 <- file.path(RES, "W70_microglia_adjusted_territory")
 cohort_lab <- c(lumbar_GSE330224 = "Lumbar cord", cervical_GSE288365 = "Cervical cord")
-set_lab <- c(up = "Frozen ALS-up", up_consensus = "Consensus up arm")
+set_lab <- c(up = "ALS-up module", up_consensus = "Consensus up genes")
 adj_lab <- c(none = "Unadjusted", microglia = "All (primary)", homeostatic = "Homeostatic", activated = "Activated")
 
 t <- read.delim(file.path(w70, "w70_adjusted_interaction_tests.tsv"))

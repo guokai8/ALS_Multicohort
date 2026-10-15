@@ -10,9 +10,9 @@ boxes <- data.frame(
   x = c(1, 1, 1, 1.6, 0.4, 1.6, 1.6),
   y = c(6, 5, 4, 3, 3, 2, 1),
   label = c("Discovery: GSE330130 motor cortex\nastrocyte-compartment pseudobulk (11 ALS / 7 ctrl)",
-            "Frozen modules: 15 ALS-up / 14 ALS-down genes",
-            "Time-stamped analysis plan\n(updates committed before each analysis)",
-            "Bulk replication (NYGC hold-out,\nno discovery donors): frozen modules",
+            "Fixed gene modules: 15 ALS-up / 14 ALS-down genes",
+            "Time-stamped analysis plan\n(each analysis written down before it is run)",
+            "Bulk replication (NYGC hold-out,\nno discovery donors): fixed modules",
             "Independent snRNA-seq: 5 contrasts\n(cohort-design audit)",
             "Spatial localisation: motor vs sensory\nterritory in lumbar and cervical cord",
             "Cell source: lineage expression,\nspot and protein co-localisation"),
@@ -31,7 +31,7 @@ pa <- ggplot() +
              linewidth = 0.25, label.r = unit(0.6, "mm"), lineheight = 0.95, label.padding = unit(1.1, "mm")) +
   scale_fill_manual(values = role_fill, name = NULL,
                     labels = c(confirmatory = "Confirmatory", consolidation = "Consolidation", discovery = "Discovery",
-                               exploratory = "Exploratory", plan = "Prespecification")) +
+                               exploratory = "Exploratory", plan = "Analysis plan")) +
   guides(fill = guide_legend(override.aes = list(colour = PAL$ink, linewidth = 0.25))) +
   coord_cartesian(xlim = c(-0.25, 2.25), ylim = c(0.5, 6.5), clip = "off") +
   theme_void(base_family = "Arial") +
@@ -122,7 +122,7 @@ cohorts <- data.frame(
                  "Author labels (summary DE)", "Bulk tissue", "Bulk tissue", "Spatial spots", "Spatial spots", "Spatial spots + protein"),
   role = c("Discovery", "Independent snRNA", "Independent snRNA", "Independent snRNA", "Independent snRNA",
            "Independent snRNA (shares donors with BA4)", "Direction only", "Confirmatory hold-out", "Confirmatory hold-out",
-           "Exploratory spatial", "Exploratory spatial", "Exploratory spatial replication"),
+           "Exploratory spatial", "Exploratory spatial", "Independent spatial support"),
   als = counts[, "als"], ctrl = counts[, "ctrl"]
 )
 cohorts$donors <- paste0(cohorts$als, " / ", cohorts$ctrl)

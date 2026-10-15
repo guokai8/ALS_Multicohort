@@ -62,7 +62,11 @@ mod_col <- c("ALS-up module" = PAL$up, "ALS-down module" = PAL$down)
 pools$note_x <- note_x[as.character(pools$module)]  # stored as columns so that saved panels are self-contained
 disc_df <- data.frame(module = factor(names(disc_note), levels = levels(fa$module)), label = disc_note)
 disc_df$note_x <- note_x[as.character(disc_df$module)]; disc_df$y <- length(rows) + 0.45
-pa <- ggplot() +
+# Both modules (supplementary) or the ALS-up module alone (main Fig. 5).
+forest <- function(keep) {
+  sub <- function(df) df[as.character(df$module) %in% keep, , drop = FALSE]
+  cohorts <- sub(cohorts); dia <- sub(dia); pools <- sub(pools); disc_df <- sub(disc_df); x_range <- sub(x_range)
+  ggplot() +
   geom_vline(xintercept = 0, linewidth = 0.3, colour = PAL$neutral) +
   annotate("rect", xmin = -Inf, xmax = Inf, ymin = 0.5, ymax = length(pool_lab) + 0.5, fill = "#F3F3F3") +
   geom_errorbar(data = cohorts, aes(y = row, xmin = lo, xmax = hi, colour = module), width = 0, orientation = "y", linewidth = 0.35) +
@@ -81,6 +85,9 @@ pa <- ggplot() +
   coord_cartesian(ylim = c(0.5, length(rows) + 0.7), clip = "off") +
   labs(x = "Standardised ALS - control module effect (d, 95% CI)", y = NULL, title = "Module effects in independent snRNA-seq contrasts") +
   theme(panel.spacing = unit(8, "mm"))
+}
+pa <- forest(levels(fa$module))
+pa_up <- forest("ALS-up module")
 
 # ---- b: genome-wide meta-analysis without discovery (run ii) ----
 gw <- read.delim(gzfile(file.path(W58, "w58_genome_wide_meta.tsv.gz")), na.strings = "NA")
@@ -110,6 +117,6 @@ pb <- ggplot(gw, aes(x = meta_logFC, y = neglog10(meta_p))) +
   theme(legend.position = c(0.02, 0.98), legend.justification = c(0, 1), legend.key.size = unit(2.4, "mm"))
 
 fig <- (pa / free(pb)) + plot_layout(heights = c(1.15, 1.1)) + plot_annotation(tag_levels = "a")
-save_panels(list(pa = pa, pb = pb), "Figure4_meta_analysis")
+save_panels(list(pa = pa, pa_up = pa_up, pb = pb), "Figure4_meta_analysis")
 save_pub_r(fig, out, "Figure4_meta_analysis", width_mm = 183, height_mm = 160)
 cat("Fig. 4 written to", out, "\n")
